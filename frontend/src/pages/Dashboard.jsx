@@ -22,12 +22,19 @@ const Dashboard = () => {
     setShowModal(true);
   };
 
+  const addNotification = (title, message, type) => {
+    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    const newNotification = { id: Date.now(), title, message, time: 'Just now', type, read: false };
+    localStorage.setItem('notifications', JSON.stringify([newNotification, ...notifications]));
+  };
+
   const handleSave = () => {
     const timestamp = new Date().toLocaleString();
     if (modalType === 'asset') {
       const newAsset = { id: Date.now(), name: formData.name, category: formData.category, room: formData.room, quantity: formData.quantity, value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0', status: 'Active', timestamp };
       const existingAssets = JSON.parse(localStorage.getItem('assets') || '[]');
       localStorage.setItem('assets', JSON.stringify([...existingAssets, newAsset]));
+      addNotification('New Asset Added', `${formData.name} added to ${formData.room}`, 'info');
       setShowModal(false);
       setFormData({});
       navigate('/assets');
@@ -35,6 +42,7 @@ const Dashboard = () => {
       const stockUpdate = { id: Date.now(), itemName: formData.itemName, currentStock: formData.currentStock, newStock: formData.newStock, timestamp };
       const existingStocks = JSON.parse(localStorage.getItem('stocks') || '[]');
       localStorage.setItem('stocks', JSON.stringify([...existingStocks, stockUpdate]));
+      addNotification('Stock Updated', `${formData.itemName} stock updated`, 'success');
       setShowModal(false);
       setFormData({});
       navigate('/stock');
@@ -42,6 +50,7 @@ const Dashboard = () => {
       const repairReport = { id: Date.now(), assetName: formData.assetName, issue: formData.issue, location: formData.location, status: 'Pending', timestamp };
       const existingRepairs = JSON.parse(localStorage.getItem('repairs') || '[]');
       localStorage.setItem('repairs', JSON.stringify([...existingRepairs, repairReport]));
+      addNotification('Repair Reported', `${formData.assetName} needs repair`, 'warning');
       setShowModal(false);
       setFormData({});
       navigate('/repairs');
@@ -49,6 +58,7 @@ const Dashboard = () => {
       const purchaseRequest = { id: Date.now(), itemName: formData.itemName, quantity: formData.quantity, cost: formData.cost, justification: formData.justification, status: 'Pending', timestamp };
       const existingPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
       localStorage.setItem('purchases', JSON.stringify([...existingPurchases, purchaseRequest]));
+      addNotification('Purchase Request', `${formData.itemName} purchase requested`, 'info');
       setShowModal(false);
       setFormData({});
       navigate('/purchases');

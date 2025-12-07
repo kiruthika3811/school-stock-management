@@ -1,16 +1,18 @@
-import React, { useState } from 'react';
-import { Menu, Bell, Search, User } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Menu, Bell, Search, User, LogOut } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Navbar = ({ toggleSidebar }) => {
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const navigate = useNavigate();
 
-  const notifications = [
-    { id: 1, title: 'Low Stock Alert', message: 'Whiteboard Markers running low', time: '5 min ago', type: 'warning' },
-    { id: 2, title: 'Repair Completed', message: 'Projector in Room 201 fixed', time: '1 hour ago', type: 'success' },
-    { id: 3, title: 'New Asset Added', message: 'Dell Laptop added to Lab 3', time: '2 hours ago', type: 'info' }
-  ];
+  useEffect(() => {
+    const storedNotifications = JSON.parse(localStorage.getItem('notifications') || '[]');
+    setNotifications(storedNotifications);
+  }, []);
+
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
     <nav className="bg-white border-b border-gray-200 px-6 py-4 sticky top-0 z-30">
@@ -37,7 +39,7 @@ const Navbar = ({ toggleSidebar }) => {
           <div className="relative">
             <button onClick={() => setShowNotifications(!showNotifications)} className="relative p-2 hover:bg-gray-100 rounded-lg flex-shrink-0">
               <Bell size={22} />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>
+              {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>}
             </button>
             
             {showNotifications && (
@@ -69,6 +71,9 @@ const Navbar = ({ toggleSidebar }) => {
             <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
               <User className="text-white" size={20} />
             </div>
+            <button onClick={() => navigate('/signin')} className="p-2 hover:bg-gray-100 rounded-lg" title="Logout">
+              <LogOut size={20} />
+            </button>
           </div>
         </div>
       </div>

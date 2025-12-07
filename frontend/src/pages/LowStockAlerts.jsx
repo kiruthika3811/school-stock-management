@@ -4,8 +4,9 @@ import { useNavigate } from 'react-router-dom';
 
 const LowStockAlerts = () => {
   const navigate = useNavigate();
+  const [filter, setFilter] = useState('all');
   
-  const [alerts, setAlerts] = useState(() => {
+  const [allAlerts] = useState(() => {
     const stockItems = JSON.parse(localStorage.getItem('stockItems') || '[]');
     return stockItems
       .filter(item => item.status === 'low' || item.status === 'critical')
@@ -18,6 +19,8 @@ const LowStockAlerts = () => {
         category: item.category
       }));
   });
+
+  const alerts = filter === 'all' ? allAlerts : allAlerts.filter(a => a.severity === filter);
   
   const handleOrder = (alert) => {
     const shortage = alert.minimum - alert.current;
@@ -45,6 +48,12 @@ const LowStockAlerts = () => {
       <div>
         <h1 className="text-3xl font-bold mb-2">Low Stock Alerts</h1>
         <p className="text-gray-500">Items requiring immediate attention</p>
+      </div>
+
+      <div className="flex gap-3">
+        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>All</button>
+        <button onClick={() => setFilter('low')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'low' ? 'bg-amber-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>Low</button>
+        <button onClick={() => setFilter('critical')} className={`px-4 py-2 rounded-lg font-medium ${filter === 'critical' ? 'bg-red-500 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>Critical</button>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="card">

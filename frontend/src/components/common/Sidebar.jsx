@@ -25,22 +25,22 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       )}
       
       <aside className={`
-        fixed top-0 left-0 h-full bg-white border-r border-gray-200 z-50 transition-transform duration-300
+        fixed top-0 left-0 h-full bg-primary border-r border-primary z-50 transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-0
         w-64
       `}>
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+        <div className="flex items-center justify-between p-6 border-b border-white/20">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Package className="text-white" size={24} />
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <Package className="text-primary" size={24} />
             </div>
             <div>
-              <h1 className="font-bold text-lg">School Asset</h1>
-              <p className="text-xs text-gray-500">Management</p>
+              <h1 className="font-bold text-lg text-white">School Asset</h1>
+              <p className="text-xs text-white/70">Management</p>
             </div>
           </div>
-          <button onClick={toggleSidebar} className="lg:hidden">
+          <button onClick={toggleSidebar} className="lg:hidden text-white">
             <X size={24} />
           </button>
         </div>
@@ -57,8 +57,8 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 className={`
                   flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                   ${isActive 
-                    ? 'bg-primary text-white' 
-                    : 'text-gray-700 hover:bg-gray-100'
+                    ? 'bg-white text-primary' 
+                    : 'text-white hover:bg-white/10'
                   }
                 `}
                 onClick={() => window.innerWidth < 1024 && toggleSidebar()}

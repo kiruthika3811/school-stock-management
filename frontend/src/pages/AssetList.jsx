@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
-import { Plus, Search, Filter, Grid, List, Edit, Trash2, Eye } from 'lucide-react';
+import React, { useState, useMemo } from 'react';
+import { Plus, Filter, Edit, Trash2 } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const AssetList = () => {
-  const [viewMode, setViewMode] = useState('grid');
-  const [searchTerm, setSearchTerm] = useState('');
+
   const [showModal, setShowModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [editingAsset, setEditingAsset] = useState(null);
@@ -58,10 +60,9 @@ const AssetList = () => {
   };
 
   const filteredAssets = assets.filter(asset => {
-    const matchesSearch = asset.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = filters.category === 'All' || asset.category === filters.category;
     const matchesStatus = filters.status === 'All' || asset.status === filters.status;
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesCategory && matchesStatus;
   });
 
   const statusColors = {
@@ -84,123 +85,72 @@ const AssetList = () => {
       </div>
 
       <div className="card">
-        <div className="flex flex-col lg:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search assets..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="input-field pl-12"
-            />
-          </div>
-          
-          <div className="flex gap-2">
-            <button onClick={() => setShowFilterModal(!showFilterModal)} className="btn-secondary flex items-center gap-2">
-              <Filter size={20} />
-              Filter
-            </button>
-            
-            <div className="flex border border-gray-300 rounded-lg overflow-hidden">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`p-2 ${viewMode === 'grid' ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}
-              >
-                <Grid size={20} />
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`p-2 ${viewMode === 'list' ? 'bg-primary text-white' : 'bg-white text-gray-700'}`}
-              >
-                <List size={20} />
-              </button>
-            </div>
-          </div>
+        <div className="flex justify-end mb-4">
+          <button onClick={() => setShowFilterModal(!showFilterModal)} className="btn-secondary flex items-center gap-2">
+            <Filter size={20} />
+            Filter
+          </button>
         </div>
 
-        {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredAssets.map((asset) => (
-              <div key={asset.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Eye size={24} className="text-gray-600" />
-                  </div>
-                  <span className={statusColors[asset.status]}>{asset.status}</span>
-                </div>
-                
-                <h3 className="font-bold text-lg mb-1">{asset.name}</h3>
-                <p className="text-sm text-gray-500 mb-3">{asset.category}</p>
-                
-                <div className="space-y-2 mb-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Room:</span>
-                    <span className="font-medium">{asset.room}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Quantity:</span>
-                    <span className="font-medium">{asset.quantity}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Value:</span>
-                    <span className="font-medium">{asset.value}</span>
-                  </div>
-                </div>
-                
-                <div className="flex gap-2">
-                  <button onClick={() => handleEdit(asset)} className="flex-1 bg-gray-100 text-gray-700 px-3 py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium flex items-center justify-center gap-2">
-                    <Edit size={16} />
-                    Edit
-                  </button>
-                  <button onClick={() => handleDelete(asset.id)} className="bg-red-100 text-red-700 px-3 py-2 rounded-lg hover:bg-red-200 transition-colors">
-                    <Trash2 size={16} />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Asset Name</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Room</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Quantity</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Value</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredAssets.map((asset) => (
-                  <tr key={asset.id} className="border-b border-gray-100 hover:bg-gray-50">
-                    <td className="py-3 px-4 font-medium">{asset.name}</td>
-                    <td className="py-3 px-4 text-gray-600">{asset.category}</td>
-                    <td className="py-3 px-4 text-gray-600">{asset.room}</td>
-                    <td className="py-3 px-4 text-gray-600">{asset.quantity}</td>
-                    <td className="py-3 px-4 text-gray-600">{asset.value}</td>
-                    <td className="py-3 px-4">
-                      <span className={statusColors[asset.status]}>{asset.status}</span>
-                    </td>
-                    <td className="py-3 px-4">
-                      <div className="flex gap-2">
-                        <button onClick={() => handleEdit(asset)} className="text-primary hover:text-blue-700">
-                          <Edit size={18} />
-                        </button>
-                        <button onClick={() => handleDelete(asset.id)} className="text-danger hover:text-red-700">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+        <div className="ag-theme-alpine" style={{ height: 600, width: '100%' }}>
+          <AgGridReact
+            rowData={filteredAssets}
+            columnDefs={[
+              { field: 'name', headerName: 'Asset Name', filter: true, sortable: true, flex: 1 },
+              { field: 'category', headerName: 'Category', filter: true, sortable: true, flex: 1 },
+              { field: 'room', headerName: 'Room', filter: true, sortable: true, flex: 1 },
+              { field: 'quantity', headerName: 'Quantity', filter: true, sortable: true, width: 120 },
+              { field: 'value', headerName: 'Value', filter: true, sortable: true, width: 120 },
+              { 
+                field: 'status', 
+                headerName: 'Status', 
+                filter: true, 
+                sortable: true,
+                width: 120,
+                cellRenderer: (params) => {
+                  const colors = {
+                    Active: 'badge-success',
+                    Repair: 'badge-warning',
+                    Retired: 'badge-danger'
+                  };
+                  return `<span class="${colors[params.value]}">${params.value}</span>`;
+                }
+              },
+              {
+                headerName: 'Actions',
+                width: 120,
+                cellRenderer: (params) => {
+                  const div = document.createElement('div');
+                  div.className = 'flex gap-2';
+                  div.innerHTML = `
+                    <button class="edit-btn text-primary hover:text-blue-700" data-id="${params.data.id}">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                      </svg>
+                    </button>
+                    <button class="delete-btn text-danger hover:text-red-700" data-id="${params.data.id}">
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                      </svg>
+                    </button>
+                  `;
+                  div.querySelector('.edit-btn').addEventListener('click', () => handleEdit(params.data));
+                  div.querySelector('.delete-btn').addEventListener('click', () => handleDelete(params.data.id));
+                  return div;
+                }
+              }
+            ]}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            pagination={true}
+            paginationPageSize={10}
+          />
+        </div>
       </div>
 
       {showFilterModal && (

@@ -15,7 +15,7 @@ body {
 }
 
 .btn-primary {
-  background-color: #40189d;
+  background-color: #2d1270;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -58,7 +58,7 @@ body {
 
 .input-field:focus {
   ring: 2px;
-  ring-color: #40189d;
+  ring-color: #2d1270;
   border-color: transparent;
 }
 
