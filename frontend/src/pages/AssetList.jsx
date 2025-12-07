@@ -1,8 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Plus, Filter, Edit, Trash2 } from 'lucide-react';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const AssetList = () => {
 
@@ -94,61 +91,44 @@ const AssetList = () => {
           </button>
         </div>
 
-        <div className="ag-theme-alpine" style={{ height: 600, width: '100%' }}>
-          <AgGridReact
-            rowData={filteredAssets}
-            columnDefs={[
-              { field: 'name', headerName: 'Asset Name', filter: true, sortable: true, flex: 1 },
-              { field: 'category', headerName: 'Category', filter: true, sortable: true, flex: 1 },
-              { field: 'room', headerName: 'Room', filter: true, sortable: true, flex: 1 },
-              { field: 'quantity', headerName: 'Quantity', filter: true, sortable: true, width: 120 },
-              { field: 'value', headerName: 'Value', filter: true, sortable: true, width: 120 },
-              { 
-                field: 'status', 
-                headerName: 'Status', 
-                filter: true, 
-                sortable: true,
-                width: 120,
-                cellRenderer: (params) => {
-                  const colors = {
-                    Active: 'badge-success',
-                    Repair: 'badge-warning',
-                    Retired: 'badge-danger'
-                  };
-                  return `<span class="${colors[params.value]}">${params.value}</span>`;
-                }
-              },
-              {
-                headerName: 'Actions',
-                width: 120,
-                cellRenderer: (params) => {
-                  const container = document.createElement('div');
-                  container.className = 'flex gap-2';
-                  
-                  const editBtn = document.createElement('button');
-                  editBtn.className = 'text-primary hover:text-blue-700';
-                  editBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
-                  editBtn.onclick = () => handleEdit(params.data);
-                  
-                  const deleteBtn = document.createElement('button');
-                  deleteBtn.className = 'text-danger hover:text-red-700';
-                  deleteBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
-                  deleteBtn.onclick = () => handleDelete(params.data.id);
-                  
-                  container.appendChild(editBtn);
-                  container.appendChild(deleteBtn);
-                  return container;
-                }
-              }
-            ]}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            pagination={true}
-            paginationPageSize={10}
-          />
+        <div className="overflow-x-auto">
+          <table className="min-w-full bg-white">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filteredAssets.map((asset) => (
+                <tr key={asset.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{asset.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.category}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.room}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.quantity}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{asset.value}</td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className={statusColors[asset.status]}>{asset.status}</span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div className="flex gap-2">
+                      <button onClick={() => handleEdit(asset)} className="text-primary hover:text-blue-700">
+                        <Edit size={18} />
+                      </button>
+                      <button onClick={() => handleDelete(asset.id)} className="text-danger hover:text-red-700">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
