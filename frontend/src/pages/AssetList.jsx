@@ -28,11 +28,13 @@ const AssetList = () => {
   });
 
   const handleDelete = (id) => {
-    const deletedAsset = assets.find(asset => asset.id === id);
-    setDeleteHistory([...deleteHistory, { ...deletedAsset, deletedAt: new Date().toLocaleString() }]);
-    const updatedAssets = assets.filter(asset => asset.id !== id);
-    setAssets(updatedAssets);
-    localStorage.setItem('assets', JSON.stringify(updatedAssets));
+    if (window.confirm('Are you sure you want to delete this asset?')) {
+      const deletedAsset = assets.find(asset => asset.id === id);
+      setDeleteHistory([...deleteHistory, { ...deletedAsset, deletedAt: new Date().toLocaleString() }]);
+      const updatedAssets = assets.filter(asset => asset.id !== id);
+      setAssets(updatedAssets);
+      localStorage.setItem('assets', JSON.stringify(updatedAssets));
+    }
   };
 
   const handleEdit = (asset) => {
@@ -120,25 +122,22 @@ const AssetList = () => {
                 headerName: 'Actions',
                 width: 120,
                 cellRenderer: (params) => {
-                  const div = document.createElement('div');
-                  div.className = 'flex gap-2';
-                  div.innerHTML = `
-                    <button class="edit-btn text-primary hover:text-blue-700" data-id="${params.data.id}">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                      </svg>
-                    </button>
-                    <button class="delete-btn text-danger hover:text-red-700" data-id="${params.data.id}">
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="3 6 5 6 21 6"></polyline>
-                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                      </svg>
-                    </button>
-                  `;
-                  div.querySelector('.edit-btn').addEventListener('click', () => handleEdit(params.data));
-                  div.querySelector('.delete-btn').addEventListener('click', () => handleDelete(params.data.id));
-                  return div;
+                  const container = document.createElement('div');
+                  container.className = 'flex gap-2';
+                  
+                  const editBtn = document.createElement('button');
+                  editBtn.className = 'text-primary hover:text-blue-700';
+                  editBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>`;
+                  editBtn.onclick = () => handleEdit(params.data);
+                  
+                  const deleteBtn = document.createElement('button');
+                  deleteBtn.className = 'text-danger hover:text-red-700';
+                  deleteBtn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>`;
+                  deleteBtn.onclick = () => handleDelete(params.data.id);
+                  
+                  container.appendChild(editBtn);
+                  container.appendChild(deleteBtn);
+                  return container;
                 }
               }
             ]}
