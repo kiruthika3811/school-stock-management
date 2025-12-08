@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/common/Sidebar';
 import Navbar from './components/common/Navbar';
 import Dashboard from './pages/Dashboard';
@@ -11,9 +12,13 @@ import LowStockAlerts from './pages/LowStockAlerts';
 import PurchaseRequests from './pages/PurchaseRequests';
 import SignIn from './pages/SignIn';
 
-function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+const ProtectedRoute = ({ children }) => {
+  const { user } = useAuth();
+  return user ? children : <Navigate to="/signin" />;
+};
 
+function AppContent() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
@@ -21,6 +26,7 @@ function App() {
       <Routes>
         <Route path="/signin" element={<SignIn />} />
         <Route path="/*" element={
+          <ProtectedRoute>
           <div className="flex h-screen bg-primary">
             <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
             
@@ -40,9 +46,18 @@ function App() {
               </main>
             </div>
           </div>
+          </ProtectedRoute>
         } />
       </Routes>
     </Router>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

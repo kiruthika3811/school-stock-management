@@ -16,6 +16,7 @@ const StockManagement = () => {
   });
   const [showModal, setShowModal] = useState(false);
   const [newItem, setNewItem] = useState({ name: '', category: '', current: 0, minimum: 0, unit: 'pcs' });
+  const [filter, setFilter] = useState('all');
 
   useEffect(() => {
     const savedStocks = JSON.parse(localStorage.getItem('stocks') || '[]');
@@ -83,6 +84,8 @@ const StockManagement = () => {
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
+  const filteredItems = filter === 'all' ? stockItems : stockItems.filter(item => item.status === filter);
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -93,6 +96,21 @@ const StockManagement = () => {
         <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
           <Plus size={20} />
           Add Stock Item
+        </button>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          All
+        </button>
+        <button onClick={() => setFilter('good')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'good' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Good
+        </button>
+        <button onClick={() => setFilter('low')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'low' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Low
+        </button>
+        <button onClick={() => setFilter('critical')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'critical' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Critical
         </button>
       </div>
 
@@ -148,7 +166,7 @@ const StockManagement = () => {
               </tr>
             </thead>
             <tbody>
-              {stockItems.map((item) => (
+              {filteredItems.map((item) => (
                 <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 px-4 font-medium">{item.name}</td>
                   <td className="py-3 px-4 text-gray-600">{item.category}</td>

@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/School-Stock-Management/static/css/main.e48b1930.css",
-    "main.js": "/School-Stock-Management/static/js/main.f0d2555e.js",
+    "main.css": "/School-Stock-Management/static/css/main.16e99468.css",
+    "main.js": "/School-Stock-Management/static/js/main.a2d2f762.js",
     "index.html": "/School-Stock-Management/index.html",
-    "main.e48b1930.css.map": "/School-Stock-Management/static/css/main.e48b1930.css.map",
-    "main.f0d2555e.js.map": "/School-Stock-Management/static/js/main.f0d2555e.js.map"
+    "main.16e99468.css.map": "/School-Stock-Management/static/css/main.16e99468.css.map",
+    "main.a2d2f762.js.map": "/School-Stock-Management/static/js/main.a2d2f762.js.map"
   },
   "entrypoints": [
-    "static/css/main.e48b1930.css",
-    "static/js/main.f0d2555e.js"
+    "static/css/main.16e99468.css",
+    "static/js/main.a2d2f762.js"
   ]
 }

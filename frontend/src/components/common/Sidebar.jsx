@@ -1,19 +1,23 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Package, Warehouse, MapPin, Wrench, AlertTriangle, ShoppingCart, Menu, X } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
   const location = useLocation();
+  const { user } = useAuth();
   
-  const menuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/' },
-    { icon: Package, label: 'Assets', path: '/assets' },
-    { icon: Warehouse, label: 'Stock Management', path: '/stock' },
-    { icon: MapPin, label: 'Room Assets', path: '/rooms' },
-    { icon: Wrench, label: 'Repair History', path: '/repairs' },
-    { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/alerts' },
-    { icon: ShoppingCart, label: 'Purchase Requests', path: '/purchases' }
+  const allMenuItems = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin', 'manager', 'staff'] },
+    { icon: Package, label: 'Assets', path: '/assets', roles: ['admin', 'manager', 'staff'] },
+    { icon: Warehouse, label: 'Stock Management', path: '/stock', roles: ['admin', 'manager'] },
+    { icon: MapPin, label: 'Room Assets', path: '/rooms', roles: ['admin', 'manager', 'staff'] },
+    { icon: Wrench, label: 'Repair History', path: '/repairs', roles: ['admin', 'manager'] },
+    { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/alerts', roles: ['admin', 'manager', 'staff'] },
+    { icon: ShoppingCart, label: 'Purchase Requests', path: '/purchases', roles: ['admin', 'manager'] }
   ];
+
+  const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
 
   return (
     <>

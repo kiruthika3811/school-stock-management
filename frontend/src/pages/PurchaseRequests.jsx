@@ -94,12 +94,15 @@ const PurchaseRequests = () => {
     }
     return defaultRequests;
   });
+  const [filter, setFilter] = useState('all');
 
   const statusConfig = {
     'Approved': { icon: CheckCircle, color: 'text-green-600', bg: 'bg-green-100', badge: 'badge-success' },
     'Pending': { icon: Clock, color: 'text-amber-600', bg: 'bg-amber-100', badge: 'badge-warning' },
     'Rejected': { icon: XCircle, color: 'text-red-600', bg: 'bg-red-100', badge: 'badge-danger' }
   };
+
+  const filteredRequests = filter === 'all' ? requests : requests.filter(r => r.status === filter);
 
   return (
     <div className="p-6 space-y-6">
@@ -111,6 +114,21 @@ const PurchaseRequests = () => {
         <button className="btn-primary flex items-center gap-2">
           <TrendingUp size={20} />
           New Purchase Request
+        </button>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          All
+        </button>
+        <button onClick={() => setFilter('Approved')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'Approved' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Approved
+        </button>
+        <button onClick={() => setFilter('Pending')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'Pending' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Pending
+        </button>
+        <button onClick={() => setFilter('Rejected')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'Rejected' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Rejected
         </button>
       </div>
 
@@ -137,7 +155,7 @@ const PurchaseRequests = () => {
 
       <div className="card">
         <div className="space-y-4">
-          {requests.map((request) => {
+          {filteredRequests.map((request) => {
             const config = statusConfig[request.status];
             return (
               <div key={request.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
