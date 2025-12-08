@@ -13,27 +13,27 @@ const StatsCard = ({ title, value, icon: Icon, trend, trendValue, color = 'prima
   return (
     <div className="card hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <p className="text-gray-500 text-sm font-medium mb-1">{title}</p>
-          <h3 className="text-3xl font-bold mb-2">{value}</h3>
+        <div className="flex-1 min-w-0">
+          <p className="text-gray-500 text-xs sm:text-sm font-medium mb-1">{title}</p>
+          <h3 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">{value}</h3>
           
           {trend && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-wrap">
               {trend === 'up' ? (
-                <TrendingUp size={16} className="text-success" />
+                <TrendingUp size={14} className="text-success sm:w-4 sm:h-4" />
               ) : (
-                <TrendingDown size={16} className="text-danger" />
+                <TrendingDown size={14} className="text-danger sm:w-4 sm:h-4" />
               )}
-              <span className={`text-sm font-medium ${trend === 'up' ? 'text-success' : 'text-danger'}`}>
+              <span className={`text-xs sm:text-sm font-medium ${trend === 'up' ? 'text-success' : 'text-danger'}`}>
                 {trendValue}
               </span>
-              <span className="text-sm text-gray-500">vs last month</span>
+              <span className="text-xs sm:text-sm text-gray-500">vs last month</span>
             </div>
           )}
         </div>
         
-        <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
-          <Icon size={24} />
+        <div className={`p-2 sm:p-3 rounded-xl ${colorClasses[color]} flex-shrink-0`}>
+          <Icon size={20} className="sm:w-6 sm:h-6" />
         </div>
       </div>
     </div>

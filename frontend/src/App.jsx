@@ -32,10 +32,10 @@ function AppContent() {
           <div className="flex h-screen bg-primary">
             <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
             
-            <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-tl-[40px]">
+            <div className="flex-1 flex flex-col overflow-hidden bg-white lg:rounded-tl-[40px]">
               <Navbar toggleSidebar={toggleSidebar} />
               
-              <main className="flex-1 overflow-y-auto bg-gray-50">
+              <main className="flex-1 overflow-y-auto bg-gray-50 overscroll-contain">
                 <Routes>
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/assets" element={<AssetList />} />

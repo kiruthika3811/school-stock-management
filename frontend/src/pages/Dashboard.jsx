@@ -103,22 +103,22 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
-        <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+        <h1 className="text-2xl sm:text-3xl font-bold mb-1 sm:mb-2">Dashboard</h1>
+        <p className="text-sm sm:text-base text-gray-500">Welcome back! Here's what's happening today.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {stats.map((stat, index) => (
           <StatsCard key={index} {...stat} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         <div className="card">
-          <h3 className="text-lg font-bold mb-4">Asset & Repair Trends</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Asset & Repair Trends</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
@@ -132,8 +132,8 @@ const Dashboard = () => {
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-bold mb-4">Assets by Category</h3>
-          <ResponsiveContainer width="100%" height={300}>
+          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Assets by Category</h3>
+          <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
                 data={assetsByCategory}
@@ -155,63 +155,63 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-6">
         <div className="card lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold">Recent Activity</h3>
-            <button className="text-primary text-sm font-medium hover:underline">View All</button>
+          <div className="flex items-center justify-between mb-3 sm:mb-4">
+            <h3 className="text-base sm:text-lg font-bold">Recent Activity</h3>
+            <button className="text-primary text-xs sm:text-sm font-medium hover:underline">View All</button>
           </div>
           
-          <div className="space-y-3">
+          <div className="space-y-2 sm:space-y-3">
             {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                <div className={`p-2 rounded-lg ${typeColors[activity.type]}`}>
-                  <Clock size={16} />
+              <div key={activity.id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                <div className={`p-1.5 sm:p-2 rounded-lg ${typeColors[activity.type]} flex-shrink-0`}>
+                  <Clock size={14} className="sm:w-4 sm:h-4" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{activity.action}</p>
-                  <p className="text-gray-600 text-sm">{activity.item}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-xs sm:text-sm">{activity.action}</p>
+                  <p className="text-gray-600 text-xs sm:text-sm truncate">{activity.item}</p>
                 </div>
-                <span className="text-xs text-gray-500">{activity.time}</span>
+                <span className="text-xs text-gray-500 flex-shrink-0">{activity.time}</span>
               </div>
             ))}
           </div>
         </div>
 
         <div className="card">
-          <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
-          <div className="space-y-3">
-            <button onClick={() => openModal('asset')} className="w-full btn-primary text-left flex items-center gap-3">
-              <Package size={20} />
-              Add New Asset
+          <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Quick Actions</h3>
+          <div className="space-y-2 sm:space-y-3">
+            <button onClick={() => openModal('asset')} className="w-full btn-primary text-left flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
+              <Package size={18} className="flex-shrink-0" />
+              <span>Add New Asset</span>
             </button>
-            <button onClick={() => openModal('stock')} className="w-full bg-success text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-left flex items-center gap-3">
-              <Warehouse size={20} />
-              Update Stock
+            <button onClick={() => openModal('stock')} className="w-full bg-success text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium text-left flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
+              <Warehouse size={18} className="flex-shrink-0" />
+              <span>Update Stock</span>
             </button>
-            <button onClick={() => openModal('repair')} className="w-full bg-warning text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors font-medium text-left flex items-center gap-3">
-              <Wrench size={20} />
-              Report Repair
+            <button onClick={() => openModal('repair')} className="w-full bg-warning text-white px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors font-medium text-left flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
+              <Wrench size={18} className="flex-shrink-0" />
+              <span>Report Repair</span>
             </button>
-            <button onClick={() => openModal('purchase')} className="w-full bg-secondary text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium text-left flex items-center gap-3">
-              <TrendingUp size={20} />
-              Purchase Request
+            <button onClick={() => openModal('purchase')} className="w-full bg-secondary text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors font-medium text-left flex items-center gap-2 sm:gap-3 text-sm sm:text-base">
+              <TrendingUp size={18} className="flex-shrink-0" />
+              <span>Purchase Request</span>
             </button>
           </div>
         </div>
       </div>
 
       {showModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-2xl font-bold mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">
               {modalType === 'asset' && 'Add New Asset'}
               {modalType === 'stock' && 'Update Stock'}
               {modalType === 'repair' && 'Report Repair'}
               {modalType === 'purchase' && 'Purchase Request'}
             </h2>
             
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {modalType === 'asset' && (
                 <>
                   <input type="text" placeholder="Enter asset name (e.g., Dell Laptop)" value={formData.name || ''} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
@@ -247,9 +247,9 @@ const Dashboard = () => {
               )}
             </div>
             
-            <div className="flex gap-3 mt-6">
-              <button onClick={handleSave} className="flex-1 btn-primary">Submit</button>
-              <button onClick={() => setShowModal(false)} className="flex-1 btn-secondary">Cancel</button>
+            <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
+              <button onClick={handleSave} className="flex-1 btn-primary text-sm sm:text-base">Submit</button>
+              <button onClick={() => setShowModal(false)} className="flex-1 btn-secondary text-sm sm:text-base">Cancel</button>
             </div>
           </div>
         </div>

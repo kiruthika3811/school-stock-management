@@ -66,43 +66,43 @@ const SignIn = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <div className="w-1/2 flex items-center justify-center p-12">
-        <div className="bg-white rounded-3xl shadow-xl p-10 w-full max-w-md">
-          <div className="flex justify-center mb-8">
-            <div className="w-20 h-20 bg-primary rounded-2xl flex items-center justify-center">
-              <Package className="text-white" size={40} />
+    <div className="min-h-screen bg-gray-50 flex flex-col lg:flex-row">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-8 lg:p-12">
+        <div className="bg-white rounded-2xl sm:rounded-3xl shadow-xl p-6 sm:p-10 w-full max-w-md">
+          <div className="flex justify-center mb-6 sm:mb-8">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-2xl flex items-center justify-center">
+              <Package className="text-white" size={32} />
             </div>
           </div>
           
-          <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
-            <p className="text-gray-500">Sign in to your admin account</p>
+          <div className="text-center mb-6 sm:mb-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Welcome Back</h2>
+            <p className="text-sm sm:text-base text-gray-500">Sign in to your admin account</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm text-center">{error}</div>}
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
+            {error && <div className="bg-red-50 text-red-600 px-3 sm:px-4 py-2 sm:py-3 rounded-xl text-xs sm:text-sm text-center">{error}</div>}
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Email Address</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white"
+                className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm sm:text-base"
                 placeholder="admin@example.com"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white"
+                  className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:bg-white text-sm sm:text-base"
                   placeholder="Enter your password"
                   required
                 />
@@ -116,25 +116,25 @@ const SignIn = () => {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between text-xs sm:text-sm">
               <label className="flex items-center">
-                <input type="checkbox" className="w-4 h-4 text-primary border-gray-300 rounded" />
-                <span className="ml-2 text-sm text-gray-600">Remember me</span>
+                <input type="checkbox" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary border-gray-300 rounded" />
+                <span className="ml-2 text-gray-600">Remember me</span>
               </label>
-              <a href="#" className="text-sm text-primary font-medium hover:underline">
+              <a href="#" className="text-primary font-medium hover:underline">
                 Forgot password?
               </a>
             </div>
 
             <button
               type="submit"
-              className="w-full bg-primary text-white py-3 rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg"
+              className="w-full bg-primary text-white py-2.5 sm:py-3 rounded-xl font-semibold hover:opacity-90 transition-all shadow-lg text-sm sm:text-base"
             >
               Sign In
             </button>
           </form>
 
-          <p className="text-center text-sm text-gray-600 mt-6">
+          <p className="text-center text-xs sm:text-sm text-gray-600 mt-4 sm:mt-6">
             Don't have an account?{' '}
             <button onClick={() => setShowContactModal(true)} className="text-primary font-semibold hover:underline">
               Contact Administrator
@@ -143,7 +143,7 @@ const SignIn = () => {
         </div>
       </div>
 
-      <div className="w-1/2 flex items-center justify-center p-12 relative overflow-hidden bg-white">
+      <div className="hidden lg:flex w-full lg:w-1/2 items-center justify-center p-12 relative overflow-hidden bg-white">
         <div className="absolute top-10 right-10 w-32 h-32 rounded-full opacity-20 animate-pulse" style={{backgroundColor: '#2d1270'}}></div>
         <div className="absolute bottom-10 left-10 w-40 h-40 rounded-full opacity-10 animate-pulse" style={{backgroundColor: '#2d1270', animationDelay: '1s'}}></div>
         
@@ -182,44 +182,44 @@ const SignIn = () => {
 
       {showContactModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md p-6 relative">
+          <div className="bg-white rounded-2xl w-full max-w-md p-4 sm:p-6 relative max-h-[90vh] overflow-y-auto">
             <button onClick={() => setShowContactModal(false)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
               <X size={24} />
             </button>
             
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{backgroundColor: '#f3e8ff'}}>
-                <Mail style={{color: '#2d1270'}} size={24} />
+            <div className="flex items-center gap-2 sm:gap-3 mb-4">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{backgroundColor: '#f3e8ff'}}>
+                <Mail style={{color: '#2d1270'}} size={20} />
               </div>
               <div>
-                <h2 className="text-xl font-bold" style={{color: '#2d1270'}}>Request Access</h2>
-                <p className="text-sm text-gray-500">Submit your information to the administrator</p>
+                <h2 className="text-lg sm:text-xl font-bold" style={{color: '#2d1270'}}>Request Access</h2>
+                <p className="text-xs sm:text-sm text-gray-500">Submit your information to the administrator</p>
               </div>
             </div>
 
             {successMessage ? (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-                <p className="text-green-700 font-medium text-center">{successMessage}</p>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-4">
+                <p className="text-green-700 font-medium text-center text-sm sm:text-base">{successMessage}</p>
               </div>
             ) : (
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Your Name</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Your Name</label>
                   <input
                     type="text"
                     value={requestName}
                     onChange={(e) => setRequestName(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
                     placeholder="Enter your full name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                  <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Email Address</label>
                   <input
                     type="email"
                     value={requestEmail}
                     onChange={(e) => setRequestEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary text-sm sm:text-base"
                     placeholder="Enter your email"
                   />
                 </div>
@@ -230,11 +230,11 @@ const SignIn = () => {
             )}
 
             {!successMessage && (
-              <div className="flex gap-3">
-                <button onClick={handleAccessRequest} className="flex-1 bg-primary text-white py-3 rounded-lg font-medium hover:opacity-90 transition-all">
+              <div className="flex gap-2 sm:gap-3">
+                <button onClick={handleAccessRequest} className="flex-1 bg-primary text-white py-2.5 sm:py-3 rounded-lg font-medium hover:opacity-90 transition-all text-sm sm:text-base">
                   Send Request
                 </button>
-                <button onClick={() => setShowContactModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg font-medium hover:bg-gray-200 transition-all">
+                <button onClick={() => setShowContactModal(false)} className="flex-1 bg-gray-100 text-gray-700 py-2.5 sm:py-3 rounded-lg font-medium hover:bg-gray-200 transition-all text-sm sm:text-base">
                   Cancel
                 </button>
               </div>
