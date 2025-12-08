@@ -10,8 +10,8 @@ const Navbar = ({ toggleSidebar }) => {
   const navigate = useNavigate();
   const { user, logout, approveAccessRequest, rejectAccessRequest } = useAuth();
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/signin');
   };
 
@@ -29,9 +29,9 @@ const Navbar = ({ toggleSidebar }) => {
     setNotifications(updatedNotifications);
   };
 
-  const handleApprove = (requestId) => {
+  const handleApprove = async (requestId) => {
     const role = selectedRole[requestId] || 'staff';
-    approveAccessRequest(requestId, role);
+    await approveAccessRequest(requestId, role);
     loadNotifications();
   };
 
@@ -40,9 +40,26 @@ const Navbar = ({ toggleSidebar }) => {
     loadNotifications();
   };
 
+  const handleDismiss = (notifId) => {
+    const updatedNotifications = notifications.filter(n => n.id !== notifId);
+    setNotifications(updatedNotifications);
+    localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
+  };
+
   useEffect(() => {
     loadNotifications();
   }, [user]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showNotifications && !event.target.closest('.notification-panel') && !event.target.closest('.notification-button')) {
+        setShowNotifications(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showNotifications]);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -69,13 +86,13 @@ const Navbar = ({ toggleSidebar }) => {
 
         <div className="flex items-center gap-3 ml-4">
           <div className="relative">
-            <button onClick={() => { setShowNotifications(!showNotifications); if (!showNotifications) markAllAsRead(); }} className="relative p-2 hover:bg-gray-100 rounded-lg flex-shrink-0">
+            <button onClick={() => { setShowNotifications(!showNotifications); if (!showNotifications) markAllAsRead(); }} className="notification-button relative p-2 hover:bg-gray-100 rounded-lg flex-shrink-0">
               <Bell size={22} />
               {unreadCount > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-danger rounded-full"></span>}
             </button>
             
             {showNotifications && (
-              <div className="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+              <div className="notification-panel fixed sm:absolute right-0 sm:right-0 left-0 sm:left-auto mt-2 sm:w-80 w-full sm:max-w-none max-w-md mx-auto sm:mx-0 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
                 <div className="p-4 border-b border-gray-200">
                   <h3 className="font-bold text-lg">Notifications</h3>
                 </div>
@@ -86,8 +103,14 @@ const Navbar = ({ toggleSidebar }) => {
                     </div>
                   ) : (
                     notifications.map((notif) => (
-                      <div key={notif.id} className="p-4 border-b border-gray-100">
-                        <p className="font-medium text-sm">{notif.title}</p>
+                      <div key={notif.id} className="p-4 border-b border-gray-100 relative">
+                        <button
+                          onClick={() => handleDismiss(notif.id)}
+                          className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
+                        >
+                          <X size={16} />
+                        </button>
+                        <p className="font-medium text-sm pr-6">{notif.title}</p>
                         <p className="text-sm text-gray-600">{notif.message}</p>
                         <p className="text-xs text-gray-400 mt-1">{notif.time}</p>
                         
@@ -121,9 +144,6 @@ const Navbar = ({ toggleSidebar }) => {
                       </div>
                     ))
                   )}
-                </div>
-                <div className="p-3 text-center border-t border-gray-200">
-                  <button onClick={() => { navigate('/alerts'); setShowNotifications(false); }} className="text-primary text-sm font-medium">View All</button>
                 </div>
               </div>
             )}

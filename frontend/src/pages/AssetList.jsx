@@ -9,6 +9,7 @@ const AssetList = () => {
   const [deleteHistory, setDeleteHistory] = useState([]);
   const [newAsset, setNewAsset] = useState({ name: '', category: '', room: '', status: 'Active', quantity: 0, value: '' });
   const [filters, setFilters] = useState({ category: 'All', status: 'All' });
+  const [statusFilter, setStatusFilter] = useState('all');
   
   const defaultAssets = [
     { id: 1, name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', status: 'Active', quantity: 25, value: '$25,000' },
@@ -61,7 +62,8 @@ const AssetList = () => {
   const filteredAssets = assets.filter(asset => {
     const matchesCategory = filters.category === 'All' || asset.category === filters.category;
     const matchesStatus = filters.status === 'All' || asset.status === filters.status;
-    return matchesCategory && matchesStatus;
+    const matchesStatusFilter = statusFilter === 'all' || asset.status === statusFilter;
+    return matchesCategory && matchesStatus && matchesStatusFilter;
   });
 
   const statusColors = {
@@ -80,6 +82,21 @@ const AssetList = () => {
         <button onClick={handleAddNew} className="btn-primary flex items-center gap-2">
           <Plus size={20} />
           Add New Asset
+        </button>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setStatusFilter('all')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          All
+        </button>
+        <button onClick={() => setStatusFilter('Active')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'Active' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Active
+        </button>
+        <button onClick={() => setStatusFilter('Repair')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'Repair' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Repair
+        </button>
+        <button onClick={() => setStatusFilter('Retired')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${statusFilter === 'Retired' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+          Retired
         </button>
       </div>
 

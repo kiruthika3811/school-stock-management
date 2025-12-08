@@ -100,7 +100,7 @@ const StockManagement = () => {
       </div>
 
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
+        <button onClick={() => setFilter('all')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
           All
         </button>
         <button onClick={() => setFilter('good')} className={`px-4 py-2 rounded-lg font-medium transition-colors ${filter === 'good' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>

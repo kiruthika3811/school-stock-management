@@ -11,6 +11,7 @@ import RepairHistory from './pages/RepairHistory';
 import LowStockAlerts from './pages/LowStockAlerts';
 import PurchaseRequests from './pages/PurchaseRequests';
 import SignIn from './pages/SignIn';
+import SetupUsers from './pages/SetupUsers';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ function AppContent() {
   return (
     <Router>
       <Routes>
+        <Route path="/setup" element={<SetupUsers />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/*" element={
           <ProtectedRoute>
