@@ -143,39 +143,34 @@ const SignIn = () => {
         </div>
       </div>
 
-      <div className="w-1/2 flex items-center justify-center p-12 relative overflow-hidden" style={{background: 'linear-gradient(to bottom right, #f3e8ff, #ffffff)'}}>
-        <div className="absolute top-10 right-10 w-32 h-32 rounded-full opacity-20" style={{backgroundColor: '#2d1270'}}></div>
-        <div className="absolute bottom-10 left-10 w-40 h-40 rounded-full opacity-10" style={{backgroundColor: '#2d1270'}}></div>
+      <div className="w-1/2 flex items-center justify-center p-12 relative overflow-hidden bg-white">
+        <div className="absolute top-10 right-10 w-32 h-32 rounded-full opacity-20 animate-pulse" style={{backgroundColor: '#2d1270'}}></div>
+        <div className="absolute bottom-10 left-10 w-40 h-40 rounded-full opacity-10 animate-pulse" style={{backgroundColor: '#2d1270', animationDelay: '1s'}}></div>
         
         <div className="text-center relative z-10">
           <div className="mb-8 relative">
-            <svg className="mx-auto" width="450" height="350" viewBox="0 0 450 350" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <ellipse cx="225" cy="310" rx="100" ry="12" fill="#E5E7EB" opacity="0.4"/>
-              <rect x="180" y="210" width="90" height="80" rx="6" fill="#1E3A5F"/>
-              <rect x="190" y="220" width="70" height="50" rx="3" fill="#374151"/>
-              <circle cx="225" cy="245" r="2" fill="#9CA3AF"/>
-              <circle cx="225" cy="95" r="45" fill="#C084FC"/>
-              <ellipse cx="225" cy="80" rx="35" ry="25" fill="#A855F7"/>
-              <circle cx="215" cy="95" r="3" fill="#1F2937"/>
-              <circle cx="235" cy="95" r="3" fill="#1F2937"/>
-              <path d="M218 105 Q225 110 232 105" stroke="#1F2937" strokeWidth="2" fill="none"/>
-              <rect x="190" y="140" width="70" height="70" rx="15" fill="#1E3A5F"/>
-              <path d="M190 170 L165 210 L175 215 L200 175 Z" fill="#C084FC"/>
-              <path d="M260 170 L285 210 L275 215 L250 175 Z" fill="#C084FC"/>
-              <rect x="60" y="100" width="50" height="60" rx="8" fill="#7C3AED" opacity="0.7"/>
-              <rect x="70" y="110" width="30" height="35" rx="3" fill="#FFF" opacity="0.9"/>
-              <line x1="75" y1="120" x2="95" y2="120" stroke="#7C3AED" strokeWidth="2"/>
-              <line x1="75" y1="128" x2="90" y2="128" stroke="#7C3AED" strokeWidth="2"/>
-              <line x1="75" y1="136" x2="95" y2="136" stroke="#7C3AED" strokeWidth="2"/>
-              <circle cx="360" cy="130" r="35" fill="#EF4444" opacity="0.7"/>
-              <circle cx="360" cy="130" r="25" fill="#FFF" opacity="0.9"/>
-              <circle cx="360" cy="130" r="15" fill="#EF4444"/>
-              <path d="M355 130 L360 135 L370 120" stroke="#FFF" strokeWidth="3" fill="none" strokeLinecap="round"/>
-              <rect x="340" y="220" width="45" height="55" rx="6" fill="#F59E0B" opacity="0.6"/>
-              <rect x="348" y="228" width="29" height="39" rx="3" fill="#FFF" opacity="0.8"/>
-              <path d="M355 240 L365 250 M365 240 L355 250" stroke="#F59E0B" strokeWidth="2"/>
-              <circle cx="90" cy="240" r="25" fill="#10B981" opacity="0.6"/>
-              <path d="M80 240 L87 247 L100 230" stroke="#FFF" strokeWidth="3" fill="none" strokeLinecap="round"/>
+            <svg className="mx-auto" width="400" height="300" viewBox="0 0 400 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="200" cy="280" rx="120" ry="12" fill="#E5E7EB" opacity="0.4"/>
+              <rect x="80" y="80" width="240" height="180" rx="16" fill="#FFF" stroke="#2d1270" strokeWidth="4"/>
+              <rect x="80" y="80" width="240" height="50" rx="16" fill="#2d1270"/>
+              <circle cx="110" cy="105" r="12" fill="#FFF" opacity="0.3"/>
+              <circle cx="140" cy="105" r="12" fill="#FFF" opacity="0.3"/>
+              <circle cx="170" cy="105" r="12" fill="#FFF" opacity="0.3"/>
+              <rect x="100" y="150" width="80" height="60" rx="8" fill="#2d1270" opacity="0.1"/>
+              <rect x="105" y="155" width="70" height="50" rx="6" fill="#2d1270"/>
+              <rect x="115" y="165" width="20" height="30" fill="#FFF" opacity="0.9"/>
+              <rect x="145" y="165" width="20" height="30" fill="#FFF" opacity="0.9"/>
+              <rect x="210" y="150" width="80" height="60" rx="8" fill="#10B981" opacity="0.1"/>
+              <circle cx="250" cy="180" r="20" fill="#10B981"/>
+              <path d="M242 180 L248 186 L258 174" stroke="#FFF" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+              <rect x="100" y="220" width="190" height="8" rx="4" fill="#E5E7EB"/>
+              <rect x="100" y="220" width="140" height="8" rx="4" fill="#2d1270"/>
+              <rect x="100" y="235" width="190" height="8" rx="4" fill="#E5E7EB"/>
+              <rect x="100" y="235" width="95" height="8" rx="4" fill="#10B981"/>
+              <circle cx="50" cy="120" r="28" fill="#2d1270" opacity="0.15"/>
+              <path d="M50 105 L50 135 M35 120 L65 120" stroke="#2d1270" strokeWidth="4" strokeLinecap="round"/>
+              <circle cx="350" cy="180" r="28" fill="#10B981" opacity="0.15"/>
+              <path d="M340 180 L347 187 L360 170" stroke="#10B981" strokeWidth="4" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </div>
           <h2 className="text-5xl font-bold mb-4" style={{color: '#2d1270'}}>Admin Portal</h2>
