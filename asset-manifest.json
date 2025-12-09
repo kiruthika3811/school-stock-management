@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/school-stock-management/static/css/main.b7d8b686.css",
+    "main.js": "/school-stock-management/static/js/main.2286e01f.js",
+    "index.html": "/school-stock-management/index.html",
+    "main.b7d8b686.css.map": "/school-stock-management/static/css/main.b7d8b686.css.map",
+    "main.2286e01f.js.map": "/school-stock-management/static/js/main.2286e01f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.b7d8b686.css",
+    "static/js/main.2286e01f.js"
+  ]
+}
