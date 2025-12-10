@@ -31,7 +31,7 @@ const Dashboard = () => {
   const handleSave = () => {
     const timestamp = new Date().toLocaleString();
     if (modalType === 'asset') {
-      const newAsset = { id: Date.now(), name: formData.name, category: formData.category, room: formData.room, quantity: formData.quantity, value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0', status: 'Active', timestamp };
+      const newAsset = { id: Date.now(), name: formData.name, category: formData.category, room: formData.room, quantity: formData.quantity, value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0', timestamp };
       const existingAssets = JSON.parse(localStorage.getItem('assets') || '[]');
       localStorage.setItem('assets', JSON.stringify([...existingAssets, newAsset]));
       addNotification('New Asset Added', `${formData.name} added to ${formData.room}`, 'info');

@@ -16,11 +16,11 @@ body {
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium;
+    @apply bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors font-medium cursor-pointer;
   }
   
   .btn-secondary {
-    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium;
+    @apply bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium cursor-pointer;
   }
   
   .card {
@@ -31,23 +31,13 @@ body {
     @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
   }
   
-  .badge {
-    @apply px-3 py-1 rounded-full text-xs font-semibold;
+  .select-field {
+    @apply w-full px-3 sm:px-4 py-2 border rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
   }
   
-  .badge-success {
-    @apply badge bg-green-100 text-green-700;
+  .select-field option:checked {
+    @apply bg-primary text-white;
   }
   
-  .badge-warning {
-    @apply badge bg-amber-100 text-amber-700;
-  }
-  
-  .badge-danger {
-    @apply badge bg-red-100 text-red-700;
-  }
-  
-  .badge-info {
-    @apply badge bg-blue-100 text-blue-700;
-  }
+
 }

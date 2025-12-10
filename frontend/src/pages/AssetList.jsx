@@ -7,17 +7,16 @@ const AssetList = () => {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [editingAsset, setEditingAsset] = useState(null);
   const [deleteHistory, setDeleteHistory] = useState([]);
-  const [newAsset, setNewAsset] = useState({ name: '', category: '', room: '', status: 'Active', quantity: 0, value: '' });
-  const [filters, setFilters] = useState({ category: 'All', status: 'All' });
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [newAsset, setNewAsset] = useState({ name: '', category: '', room: '', quantity: 0, value: '' });
+  const [filters, setFilters] = useState({ category: 'All' });
   
   const defaultAssets = [
-    { id: 1, name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', status: 'Active', quantity: 25, value: '$25,000' },
-    { id: 2, name: 'Projector', category: 'Electronics', room: 'Room 201', status: 'Repair', quantity: 1, value: '$1,200' },
-    { id: 3, name: 'Desk Chair', category: 'Furniture', room: 'Office', status: 'Active', quantity: 50, value: '$5,000' },
-    { id: 4, name: 'Microscope', category: 'Lab Equipment', room: 'Science Lab', status: 'Active', quantity: 15, value: '$18,000' },
-    { id: 5, name: 'Whiteboard', category: 'Furniture', room: 'Room 105', status: 'Active', quantity: 30, value: '$3,000' },
-    { id: 6, name: 'Basketball', category: 'Sports', room: 'Gym', status: 'Active', quantity: 20, value: '$600' }
+    { id: 1, name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', quantity: 25, value: '$25,000' },
+    { id: 2, name: 'Projector', category: 'Electronics', room: 'Room 201', quantity: 1, value: '$1,200' },
+    { id: 3, name: 'Desk Chair', category: 'Furniture', room: 'Office', quantity: 50, value: '$5,000' },
+    { id: 4, name: 'Microscope', category: 'Lab Equipment', room: 'Science Lab', quantity: 15, value: '$18,000' },
+    { id: 5, name: 'Whiteboard', category: 'Furniture', room: 'Room 105', quantity: 30, value: '$3,000' },
+    { id: 6, name: 'Basketball', category: 'Sports', room: 'Gym', quantity: 20, value: '$600' }
   ];
 
   const [assets, setAssets] = useState(() => {
@@ -46,7 +45,7 @@ const AssetList = () => {
       updatedAssets = assets.map(a => a.id === editingAsset.id ? editingAsset : a);
     } else {
       updatedAssets = [...assets, { ...newAsset, id: Date.now() }];
-      setNewAsset({ name: '', category: '', room: '', status: 'Active', quantity: 0, value: '' });
+      setNewAsset({ name: '', category: '', room: '', quantity: 0, value: '' });
     }
     setAssets(updatedAssets);
     localStorage.setItem('assets', JSON.stringify(updatedAssets));
@@ -61,16 +60,10 @@ const AssetList = () => {
 
   const filteredAssets = assets.filter(asset => {
     const matchesCategory = filters.category === 'All' || asset.category === filters.category;
-    const matchesStatus = filters.status === 'All' || asset.status === filters.status;
-    const matchesStatusFilter = statusFilter === 'all' || asset.status === statusFilter;
-    return matchesCategory && matchesStatus && matchesStatusFilter;
+    return matchesCategory;
   });
 
-  const statusColors = {
-    Active: 'badge-success',
-    Repair: 'badge-warning',
-    Retired: 'badge-danger'
-  };
+
 
   return (
     <div className="p-3 sm:p-6 space-y-4 sm:space-y-6">
@@ -85,20 +78,7 @@ const AssetList = () => {
         </button>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        <button onClick={() => setStatusFilter('all')} className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap ${statusFilter === 'all' ? 'bg-primary text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-          All
-        </button>
-        <button onClick={() => setStatusFilter('Active')} className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap ${statusFilter === 'Active' ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-          Active
-        </button>
-        <button onClick={() => setStatusFilter('Repair')} className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap ${statusFilter === 'Repair' ? 'bg-amber-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-          Repair
-        </button>
-        <button onClick={() => setStatusFilter('Retired')} className={`px-3 sm:px-4 py-2 rounded-lg font-medium transition-colors text-sm whitespace-nowrap ${statusFilter === 'Retired' ? 'bg-red-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}`}>
-          Retired
-        </button>
-      </div>
+
 
       <div className="card">
         <div className="flex justify-end mb-3 sm:mb-4">
@@ -117,7 +97,6 @@ const AssetList = () => {
                 <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Room</th>
                 <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Quantity</th>
                 <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Value</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                 <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
@@ -129,12 +108,9 @@ const AssetList = () => {
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">{asset.room}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">{asset.quantity}</td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">{asset.value}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap">
-                    <span className={`${statusColors[asset.status]} text-xs`}>{asset.status}</span>
-                  </td>
                   <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm font-medium">
                     <div className="flex gap-2">
-                      <button onClick={() => handleEdit(asset)} className="text-primary hover:text-blue-700">
+                      <button onClick={() => handleEdit(asset)} className="text-primary hover:text-primary/80">
                         <Edit size={16} />
                       </button>
                       <button onClick={() => handleDelete(asset.id)} className="text-danger hover:text-red-700">
@@ -164,18 +140,10 @@ const AssetList = () => {
                   <option value="Sports">Sports</option>
                 </select>
               </div>
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-2">Status</label>
-                <select value={filters.status} onChange={(e) => setFilters({...filters, status: e.target.value})} className="w-full px-3 sm:px-4 py-2 border rounded-lg text-sm sm:text-base">
-                  <option value="All">All Status</option>
-                  <option value="Active">Active</option>
-                  <option value="Repair">Repair</option>
-                  <option value="Retired">Retired</option>
-                </select>
-              </div>
+
             </div>
             <div className="flex gap-2 sm:gap-3 mt-4 sm:mt-6">
-              <button onClick={() => { setFilters({ category: 'All', status: 'All' }); setShowFilterModal(false); }} className="flex-1 btn-secondary text-sm sm:text-base">Clear</button>
+              <button onClick={() => { setFilters({ category: 'All' }); setShowFilterModal(false); }} className="flex-1 btn-secondary text-sm sm:text-base">Clear</button>
               <button onClick={() => setShowFilterModal(false)} className="flex-1 btn-primary text-sm sm:text-base">Apply</button>
             </div>
           </div>
@@ -211,15 +179,6 @@ const AssetList = () => {
               <div>
                 <label className="block text-xs sm:text-sm font-medium mb-1">Value</label>
                 <input type="text" placeholder="e.g., $1,000" value={editingAsset ? editingAsset.value : newAsset.value} onChange={(e) => editingAsset ? setEditingAsset({...editingAsset, value: e.target.value}) : setNewAsset({...newAsset, value: e.target.value})} className="input-field text-sm sm:text-base" />
-              </div>
-              
-              <div>
-                <label className="block text-xs sm:text-sm font-medium mb-1">Status</label>
-                <select value={editingAsset ? editingAsset.status : newAsset.status} onChange={(e) => editingAsset ? setEditingAsset({...editingAsset, status: e.target.value}) : setNewAsset({...newAsset, status: e.target.value})} className="input-field text-sm sm:text-base">
-                  <option value="Active">Active</option>
-                  <option value="Repair">Repair</option>
-                  <option value="Retired">Retired</option>
-                </select>
               </div>
             </div>
             
