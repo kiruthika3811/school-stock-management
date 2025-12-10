@@ -1,5 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Plus, Minus, Package, AlertCircle } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const StockManagement = () => {
   const defaultStockItems = [
@@ -86,6 +89,61 @@ const StockManagement = () => {
 
   const filteredItems = filter === 'all' ? stockItems : stockItems.filter(item => item.status === filter);
 
+  const columnDefs = useMemo(() => [
+    { field: 'name', headerName: 'Item Name', flex: 1, sortable: true, filter: true },
+    { field: 'category', headerName: 'Category', flex: 1, sortable: true, filter: true },
+    {
+      field: 'current',
+      headerName: 'Current Stock',
+      width: 150,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      valueFormatter: (params) => `${params.value} ${params.data.unit}`
+    },
+    {
+      field: 'minimum',
+      headerName: 'Minimum Level',
+      width: 150,
+      sortable: true,
+      filter: 'agNumberColumnFilter',
+      valueFormatter: (params) => `${params.value} ${params.data.unit}`
+    },
+    {
+      field: 'status',
+      headerName: 'Status',
+      width: 120,
+      sortable: true,
+      filter: true,
+      cellRenderer: (params) => {
+        const status = params.value;
+        const badgeClass = status === 'good' ? 'bg-green-100 text-green-800' :
+                          status === 'low' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800';
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${badgeClass}`}>
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </span>
+        );
+      }
+    },
+    {
+      headerName: 'Actions',
+      width: 120,
+      cellRenderer: (params) => (
+        <div className="flex gap-2 h-full items-center">
+          <button onClick={() => handleIncrease(params.data.id)} className="bg-green-100 text-green-700 p-1 rounded hover:bg-green-200">
+            <Plus size={16} />
+          </button>
+          <button onClick={() => handleDecrease(params.data.id)} className="bg-red-100 text-red-700 p-1 rounded hover:bg-red-200">
+            <Minus size={16} />
+          </button>
+        </div>
+      ),
+      sortable: false,
+      filter: false
+    }
+  ], []);
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -153,44 +211,19 @@ const StockManagement = () => {
       </div>
 
       <div className="card">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Item Name</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Category</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Current Stock</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Minimum Level</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Status</th>
-                <th className="text-left py-3 px-4 font-semibold text-gray-700">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredItems.map((item) => (
-                <tr key={item.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-4 font-medium">{item.name}</td>
-                  <td className="py-3 px-4 text-gray-600">{item.category}</td>
-                  <td className="py-3 px-4">
-                    <span className="font-semibold">{item.current}</span> {item.unit}
-                  </td>
-                  <td className="py-3 px-4 text-gray-600">{item.minimum} {item.unit}</td>
-                  <td className="py-3 px-4">
-                    <span className={getStatusBadge(item.status)}>{getStatusText(item.status)}</span>
-                  </td>
-                  <td className="py-3 px-4">
-                    <div className="flex gap-2">
-                      <button onClick={() => handleIncrease(item.id)} className="bg-green-100 text-green-700 p-2 rounded-lg hover:bg-green-200 transition-colors">
-                        <Plus size={18} />
-                      </button>
-                      <button onClick={() => handleDecrease(item.id)} className="bg-red-100 text-red-700 p-2 rounded-lg hover:bg-red-200 transition-colors">
-                        <Minus size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
+          <AgGridReact
+            rowData={filteredItems}
+            columnDefs={columnDefs}
+            pagination={true}
+            paginationPageSize={10}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            suppressRowClickSelection={true}
+          />
         </div>
       </div>
 

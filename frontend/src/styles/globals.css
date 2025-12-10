@@ -41,3 +41,23 @@ body {
   
 
 }
+/* AG Grid Custom Styles */
+.ag-theme-alpine {
+  --ag-font-family: inherit;
+  --ag-font-size: 14px;
+  --ag-header-background-color: #f8fafc;
+  --ag-odd-row-background-color: #ffffff;
+  --ag-even-row-background-color: #f9fafb;
+  --ag-row-hover-color: #f1f5f9;
+  --ag-border-color: #e2e8f0;
+}
+
+.ag-theme-alpine .ag-header-cell {
+  font-weight: 600;
+  color: #374151;
+}
+
+.ag-theme-alpine .ag-cell {
+  display: flex;
+  align-items: center;
+}

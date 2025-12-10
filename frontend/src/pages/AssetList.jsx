@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Plus, Filter, Edit, Trash2 } from 'lucide-react';
+import { AgGridReact } from 'ag-grid-react';
+import 'ag-grid-community/styles/ag-grid.css';
+import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const AssetList = () => {
 
@@ -63,6 +66,30 @@ const AssetList = () => {
     return matchesCategory;
   });
 
+  const columnDefs = useMemo(() => [
+    { field: 'name', headerName: 'Asset Name', flex: 1, sortable: true, filter: true },
+    { field: 'category', headerName: 'Category', flex: 1, sortable: true, filter: true },
+    { field: 'room', headerName: 'Room', flex: 1, sortable: true, filter: true },
+    { field: 'quantity', headerName: 'Quantity', width: 120, sortable: true, filter: 'agNumberColumnFilter' },
+    { field: 'value', headerName: 'Value', width: 120, sortable: true, filter: true },
+    {
+      headerName: 'Actions',
+      width: 120,
+      cellRenderer: (params) => (
+        <div className="flex gap-2 h-full items-center">
+          <button onClick={() => handleEdit(params.data)} className="text-primary hover:text-primary/80">
+            <Edit size={16} />
+          </button>
+          <button onClick={() => handleDelete(params.data.id)} className="text-red-600 hover:text-red-700">
+            <Trash2 size={16} />
+          </button>
+        </div>
+      ),
+      sortable: false,
+      filter: false
+    }
+  ], []);
+
 
 
   return (
@@ -88,40 +115,19 @@ const AssetList = () => {
           </button>
         </div>
 
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
-          <table className="min-w-full bg-white">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset Name</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Category</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Room</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Quantity</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Value</th>
-                <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {filteredAssets.map((asset) => (
-                <tr key={asset.id} className="hover:bg-gray-50">
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">{asset.name}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">{asset.category}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">{asset.room}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">{asset.quantity}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">{asset.value}</td>
-                  <td className="px-3 sm:px-6 py-3 sm:py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex gap-2">
-                      <button onClick={() => handleEdit(asset)} className="text-primary hover:text-primary/80">
-                        <Edit size={16} />
-                      </button>
-                      <button onClick={() => handleDelete(asset.id)} className="text-danger hover:text-red-700">
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
+          <AgGridReact
+            rowData={filteredAssets}
+            columnDefs={columnDefs}
+            pagination={true}
+            paginationPageSize={10}
+            defaultColDef={{
+              resizable: true,
+              sortable: true,
+              filter: true
+            }}
+            suppressRowClickSelection={true}
+          />
         </div>
       </div>
 
