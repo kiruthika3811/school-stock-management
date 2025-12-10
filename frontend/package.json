@@ -2,7 +2,7 @@
   "name": "school-asset-management",
   "version": "1.0.0",
   "private": true,
-  "homepage": "https://kiruthika3811.github.io/school-stock-management",
+
   "dependencies": {
     "ag-grid-community": "^31.3.4",
     "ag-grid-react": "^31.3.4",
