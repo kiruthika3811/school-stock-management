@@ -3,7 +3,7 @@ import { Package, Warehouse, Wrench, AlertTriangle, TrendingUp, Clock } from 'lu
 import { useNavigate } from 'react-router-dom';
 import StatsCard from '../components/dashboard/StatsCard';
 import AdminPanel from '../components/admin/AdminPanel';
-import DatabaseInit from '../components/admin/DatabaseInit';
+
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useStats, useFirebaseData } from '../hooks/useFirebaseData';
 import databaseService from '../services/databaseService';
@@ -144,7 +144,7 @@ const Dashboard = () => {
         )}
       </div>
 
-      <DatabaseInit />
+
       <AdminPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
