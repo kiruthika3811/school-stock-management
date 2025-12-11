@@ -52,7 +52,7 @@ export const AuthProvider = ({ children }) => {
       provider.setCustomParameters({
         prompt: 'select_account'
       });
-      const result = await signInWithPopup(auth, provider);
+      await signInWithRedirect(auth, provider);
       return { success: true };
     } catch (error) {
       console.error('Google login error:', error);
