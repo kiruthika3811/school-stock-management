@@ -7,7 +7,7 @@ const RepairHistory = () => {
 
 
   const [showModal, setShowModal] = useState(false);
-  const [newRepair, setNewRepair] = useState({ assetName: '', location: '', issue: '' });
+  const [newRepair, setNewRepair] = useState({ assetName: '', location: '', issue: '', cost: '' });
   const [filter, setFilter] = useState('All');
 
   const handleUpdateStatus = async (firebaseId, newStatus) => {
@@ -23,10 +23,11 @@ const RepairHistory = () => {
       await databaseService.addRepair({
         assetName: newRepair.assetName,
         issue: newRepair.issue,
-        location: newRepair.location
+        location: newRepair.location,
+        cost: newRepair.cost || 'TBD'
       });
       setShowModal(false);
-      setNewRepair({ assetName: '', location: '', issue: '' });
+      setNewRepair({ assetName: '', location: '', issue: '', cost: '' });
     } catch (error) {
       console.error('Error submitting repair:', error);
     }
@@ -77,8 +78,8 @@ const RepairHistory = () => {
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
                         <div><p className="text-gray-500">Location</p><p className="font-medium">{repair.location}</p></div>
                         <div><p className="text-gray-500">Issue</p><p className="font-medium">{repair.issue}</p></div>
-                        <div><p className="text-gray-500">Date</p><p className="font-medium">{repair.date}</p></div>
-                        <div><p className="text-gray-500">Cost</p><p className="font-medium">{repair.cost}</p></div>
+                        <div><p className="text-gray-500">Date</p><p className="font-medium">{repair.createdAt ? new Date(repair.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}</p></div>
+                        <div><p className="text-gray-500">Cost</p><p className="font-medium">{repair.cost || 'TBD'}</p></div>
                       </div>
                       {repair.status === 'Pending' && (
                         <div className="flex gap-2">
@@ -115,6 +116,10 @@ const RepairHistory = () => {
               <div>
                 <label className="block text-sm font-medium mb-1">Issue Description</label>
                 <textarea placeholder="Describe the issue" value={newRepair.issue} onChange={(e) => setNewRepair({...newRepair, issue: e.target.value})} className="w-full px-4 py-2 border rounded-lg" rows="3"></textarea>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Estimated Cost</label>
+                <input type="text" placeholder="e.g., 500 (optional)" value={newRepair.cost} onChange={(e) => setNewRepair({...newRepair, cost: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
               </div>
             </div>
             <div className="flex gap-3 mt-6">

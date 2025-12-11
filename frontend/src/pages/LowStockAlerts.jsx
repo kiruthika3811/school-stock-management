@@ -28,7 +28,7 @@ const LowStockAlerts = () => {
       id: Date.now(),
       itemName: alert.item,
       quantity: shortage,
-      cost: `$${shortage * 10}`,
+      cost: `${shortage * 10}`,
       justification: `Low stock alert - Current: ${alert.current}, Required: ${alert.minimum}`,
       status: 'Pending',
       timestamp: new Date().toLocaleString()

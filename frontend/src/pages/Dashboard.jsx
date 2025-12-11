@@ -39,13 +39,14 @@ const Dashboard = () => {
           category: formData.category,
           room: formData.room,
           quantity: parseInt(formData.quantity) || 1,
-          value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0'
+          value: formData.quantity ? `${parseInt(formData.quantity) * 100}` : '0'
         });
         await addNotification('New Asset Added', `${formData.name} added to ${formData.room}`, 'success');
         navigate('/assets');
       } else if (modalType === 'stock') {
         await databaseService.addStockItem({
           itemName: formData.itemName,
+          category: formData.category,
           currentStock: parseInt(formData.currentStock) || 0,
           newStock: parseInt(formData.newStock) || 0,
           minStock: 10
@@ -260,6 +261,7 @@ const Dashboard = () => {
               {modalType === 'stock' && (
                 <>
                   <input type="text" placeholder="Enter item name" value={formData.itemName || ''} onChange={(e) => setFormData({...formData, itemName: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
+                  <input type="text" placeholder="Enter category (e.g., Electronics, Furniture)" value={formData.category || ''} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
                   <input type="number" placeholder="Enter current stock level" value={formData.currentStock || ''} onChange={(e) => setFormData({...formData, currentStock: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
                   <input type="number" placeholder="Enter new stock level" value={formData.newStock || ''} onChange={(e) => setFormData({...formData, newStock: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
                 </>
@@ -277,7 +279,7 @@ const Dashboard = () => {
                 <>
                   <input type="text" placeholder="Enter item name" value={formData.itemName || ''} onChange={(e) => setFormData({...formData, itemName: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
                   <input type="number" placeholder="Enter quantity needed" value={formData.quantity || ''} onChange={(e) => setFormData({...formData, quantity: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
-                  <input type="text" placeholder="Enter estimated cost (e.g., $5,000)" value={formData.cost || ''} onChange={(e) => setFormData({...formData, cost: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
+                  <input type="text" placeholder="Enter estimated cost (e.g., 5000)" value={formData.cost || ''} onChange={(e) => setFormData({...formData, cost: e.target.value})} className="w-full px-4 py-2 border rounded-lg" />
                   <textarea placeholder="Enter justification for purchase" value={formData.justification || ''} onChange={(e) => setFormData({...formData, justification: e.target.value})} className="w-full px-4 py-2 border rounded-lg" rows="3"></textarea>
                 </>
               )}

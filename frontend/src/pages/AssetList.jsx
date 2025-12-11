@@ -194,7 +194,7 @@ const AssetList = () => {
               
               <div>
                 <label className="block text-xs sm:text-sm font-medium mb-1">Value</label>
-                <input type="text" placeholder="e.g., $1,000" value={editingAsset ? editingAsset.value : newAsset.value} onChange={(e) => editingAsset ? setEditingAsset({...editingAsset, value: e.target.value}) : setNewAsset({...newAsset, value: e.target.value})} className="input-field text-sm sm:text-base" />
+                <input type="text" placeholder="e.g., 1000" value={editingAsset ? editingAsset.value : newAsset.value} onChange={(e) => editingAsset ? setEditingAsset({...editingAsset, value: e.target.value}) : setNewAsset({...newAsset, value: e.target.value})} className="input-field text-sm sm:text-base" />
               </div>
             </div>
             

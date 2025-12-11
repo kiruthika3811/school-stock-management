@@ -2,12 +2,12 @@ import { ref, set } from 'firebase/database';
 import { rtdb } from '../firebase/config';
 
 const sampleAssets = [
-  { id: '1', name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', quantity: 25, value: '$25,000' },
-  { id: '2', name: 'Projector', category: 'Electronics', room: 'Room 201', quantity: 1, value: '$1,200' },
-  { id: '3', name: 'Desk Chair', category: 'Furniture', room: 'Office', quantity: 50, value: '$5,000' },
-  { id: '4', name: 'Microscope', category: 'Lab Equipment', room: 'Science Lab', quantity: 15, value: '$18,000' },
-  { id: '5', name: 'Whiteboard', category: 'Furniture', room: 'Room 105', quantity: 30, value: '$3,000' },
-  { id: '6', name: 'Basketball', category: 'Sports', room: 'Gym', quantity: 20, value: '$600' }
+  { id: '1', name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', quantity: 25, value: '25000' },
+  { id: '2', name: 'Projector', category: 'Electronics', room: 'Room 201', quantity: 1, value: '1200' },
+  { id: '3', name: 'Desk Chair', category: 'Furniture', room: 'Office', quantity: 50, value: '5000' },
+  { id: '4', name: 'Microscope', category: 'Lab Equipment', room: 'Science Lab', quantity: 15, value: '18000' },
+  { id: '5', name: 'Whiteboard', category: 'Furniture', room: 'Room 105', quantity: 30, value: '3000' },
+  { id: '6', name: 'Basketball', category: 'Sports', room: 'Gym', quantity: 20, value: '600' }
 ];
 
 const sampleStock = [
@@ -25,9 +25,9 @@ const sampleRepairs = [
 ];
 
 const samplePurchases = [
-  { id: '1', itemName: 'New Laptops', quantity: 10, cost: '$15,000', justification: 'Replace old computers in Lab 2', status: 'Pending' },
-  { id: '2', itemName: 'Office Chairs', quantity: 25, cost: '$3,750', justification: 'Staff room furniture upgrade', status: 'Approved' },
-  { id: '3', itemName: 'Science Equipment', quantity: 1, cost: '$8,500', justification: 'Chemistry lab expansion', status: 'Ordered' }
+  { id: '1', itemName: 'New Laptops', quantity: 10, cost: '15000', justification: 'Replace old computers in Lab 2', status: 'Pending' },
+  { id: '2', itemName: 'Office Chairs', quantity: 25, cost: '3750', justification: 'Staff room furniture upgrade', status: 'Approved' },
+  { id: '3', itemName: 'Science Equipment', quantity: 1, cost: '8500', justification: 'Chemistry lab expansion', status: 'Ordered' }
 ];
 
 export const initializeDatabase = async () => {
