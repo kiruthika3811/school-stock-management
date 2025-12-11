@@ -3,36 +3,14 @@ import { Plus, Minus, Package, AlertCircle } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useFirebaseData } from '../hooks/useFirebaseData';
+import databaseService from '../services/databaseService';
 
 const StockManagement = () => {
-  const defaultStockItems = [
-    { id: 1, name: 'Whiteboard Markers', category: 'Stationery', current: 45, minimum: 50, unit: 'pcs', status: 'low' },
-    { id: 2, name: 'A4 Paper Reams', category: 'Stationery', current: 120, minimum: 50, unit: 'reams', status: 'good' },
-    { id: 3, name: 'Chemistry Beakers', category: 'Lab', current: 30, minimum: 25, unit: 'pcs', status: 'good' },
-    { id: 4, name: 'Printer Ink Cartridges', category: 'Electronics', current: 8, minimum: 15, unit: 'pcs', status: 'critical' },
-    { id: 5, name: 'Cleaning Supplies', category: 'Maintenance', current: 25, minimum: 20, unit: 'units', status: 'good' }
-  ];
-
-  const [stockItems, setStockItems] = useState(() => {
-    const saved = localStorage.getItem('stockItems');
-    return saved ? JSON.parse(saved) : defaultStockItems;
-  });
+  const { data: stockItems, loading, error } = useFirebaseData('stock');
   const [showModal, setShowModal] = useState(false);
-  const [newItem, setNewItem] = useState({ name: '', category: '', current: 0, minimum: 0, unit: 'pcs' });
+  const [newItem, setNewItem] = useState({ name: '', category: '', currentStock: 0, minStock: 0, unit: 'pcs' });
   const [filter, setFilter] = useState('all');
-
-  useEffect(() => {
-    const savedStocks = JSON.parse(localStorage.getItem('stocks') || '[]');
-    if (savedStocks.length > 0) {
-      const updated = stockItems.map(item => {
-        const stockUpdate = savedStocks.find(s => s.itemName === item.name);
-        return stockUpdate ? { ...item, current: parseInt(stockUpdate.newStock) } : item;
-      });
-      setStockItems(updated);
-      localStorage.setItem('stockItems', JSON.stringify(updated));
-      localStorage.removeItem('stocks');
-    }
-  }, []);
 
   const updateStatus = (current, minimum) => {
     if (current <= minimum * 0.5) return 'critical';
@@ -40,38 +18,52 @@ const StockManagement = () => {
     return 'good';
   };
 
-  const handleIncrease = (id) => {
-    const updated = stockItems.map(item => {
-      if (item.id === id) {
-        const newCurrent = item.current + 1;
-        return { ...item, current: newCurrent, status: updateStatus(newCurrent, item.minimum) };
-      }
-      return item;
-    });
-    setStockItems(updated);
-    localStorage.setItem('stockItems', JSON.stringify(updated));
+  const getStockWithStatus = (items) => {
+    return items.map(item => ({
+      ...item,
+      status: updateStatus(item.currentStock || 0, item.minStock || 10)
+    }));
   };
 
-  const handleDecrease = (id) => {
-    const updated = stockItems.map(item => {
-      if (item.id === id && item.current > 0) {
-        const newCurrent = item.current - 1;
-        return { ...item, current: newCurrent, status: updateStatus(newCurrent, item.minimum) };
-      }
-      return item;
-    });
-    setStockItems(updated);
-    localStorage.setItem('stockItems', JSON.stringify(updated));
+  const stockWithStatus = getStockWithStatus(stockItems);
+
+  const handleIncrease = async (firebaseId, currentStock) => {
+    try {
+      await databaseService.updateStock(firebaseId, {
+        currentStock: currentStock + 1
+      });
+    } catch (error) {
+      console.error('Error updating stock:', error);
+    }
   };
 
-  const handleAddItem = () => {
-    const status = newItem.current < newItem.minimum ? 'critical' : newItem.current < newItem.minimum * 1.2 ? 'low' : 'good';
-    const item = { id: Date.now(), ...newItem, status };
-    const updated = [...stockItems, item];
-    setStockItems(updated);
-    localStorage.setItem('stockItems', JSON.stringify(updated));
-    setShowModal(false);
-    setNewItem({ name: '', category: '', current: 0, minimum: 0, unit: 'pcs' });
+  const handleDecrease = async (firebaseId, currentStock) => {
+    if (currentStock > 0) {
+      try {
+        await databaseService.updateStock(firebaseId, {
+          currentStock: currentStock - 1
+        });
+      } catch (error) {
+        console.error('Error updating stock:', error);
+      }
+    }
+  };
+
+  const handleAddItem = async () => {
+    try {
+      await databaseService.addStockItem({
+        itemName: newItem.name,
+        category: newItem.category,
+        currentStock: newItem.currentStock,
+        minStock: newItem.minStock,
+        unit: newItem.unit
+      });
+      setShowModal(false);
+      setNewItem({ name: '', category: '', currentStock: 0, minStock: 0, unit: 'pcs' });
+    } catch (error) {
+      console.error('Error adding stock item:', error);
+      alert('Error adding stock item. Please try again.');
+    }
   };
 
   const getStatusBadge = (status) => {
@@ -87,26 +79,26 @@ const StockManagement = () => {
     return status.charAt(0).toUpperCase() + status.slice(1);
   };
 
-  const filteredItems = filter === 'all' ? stockItems : stockItems.filter(item => item.status === filter);
+  const filteredItems = filter === 'all' ? stockWithStatus : stockWithStatus.filter(item => item.status === filter);
 
   const columnDefs = useMemo(() => [
-    { field: 'name', headerName: 'Item Name', flex: 1, sortable: true, filter: true },
+    { field: 'itemName', headerName: 'Item Name', flex: 1, sortable: true, filter: true },
     { field: 'category', headerName: 'Category', flex: 1, sortable: true, filter: true },
     {
-      field: 'current',
+      field: 'currentStock',
       headerName: 'Current Stock',
       width: 150,
       sortable: true,
       filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => `${params.value} ${params.data.unit}`
+      valueFormatter: (params) => `${params.value || 0} ${params.data.unit || 'pcs'}`
     },
     {
-      field: 'minimum',
+      field: 'minStock',
       headerName: 'Minimum Level',
       width: 150,
       sortable: true,
       filter: 'agNumberColumnFilter',
-      valueFormatter: (params) => `${params.value} ${params.data.unit}`
+      valueFormatter: (params) => `${params.value || 0} ${params.data.unit || 'pcs'}`
     },
     {
       field: 'status',
@@ -131,10 +123,10 @@ const StockManagement = () => {
       width: 120,
       cellRenderer: (params) => (
         <div className="flex gap-2 h-full items-center">
-          <button onClick={() => handleIncrease(params.data.id)} className="bg-green-100 text-green-700 p-1 rounded hover:bg-green-200">
+          <button onClick={() => handleIncrease(params.data.firebaseId, params.data.currentStock || 0)} className="bg-green-100 text-green-700 p-1 rounded hover:bg-green-200">
             <Plus size={16} />
           </button>
-          <button onClick={() => handleDecrease(params.data.id)} className="bg-red-100 text-red-700 p-1 rounded hover:bg-red-200">
+          <button onClick={() => handleDecrease(params.data.firebaseId, params.data.currentStock || 0)} className="bg-red-100 text-red-700 p-1 rounded hover:bg-red-200">
             <Minus size={16} />
           </button>
         </div>
@@ -180,7 +172,7 @@ const StockManagement = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Items</p>
-              <p className="text-2xl font-bold">{stockItems.reduce((sum, item) => sum + item.current, 0)}</p>
+              <p className="text-2xl font-bold">{stockWithStatus.reduce((sum, item) => sum + (item.currentStock || 0), 0)}</p>
             </div>
           </div>
         </div>
@@ -192,7 +184,7 @@ const StockManagement = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Low Stock</p>
-              <p className="text-2xl font-bold">{stockItems.filter(item => item.status === 'low').length}</p>
+              <p className="text-2xl font-bold">{stockWithStatus.filter(item => item.status === 'low').length}</p>
             </div>
           </div>
         </div>
@@ -204,27 +196,33 @@ const StockManagement = () => {
             </div>
             <div>
               <p className="text-sm text-gray-500">Critical Stock</p>
-              <p className="text-2xl font-bold">{stockItems.filter(item => item.status === 'critical').length}</p>
+              <p className="text-2xl font-bold">{stockWithStatus.filter(item => item.status === 'critical').length}</p>
             </div>
           </div>
         </div>
       </div>
 
       <div className="card">
-        <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
-          <AgGridReact
-            rowData={filteredItems}
-            columnDefs={columnDefs}
-            pagination={true}
-            paginationPageSize={10}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            suppressRowClickSelection={true}
-          />
-        </div>
+        {loading ? (
+          <div className="text-center py-8">Loading stock items...</div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-600">Error loading stock: {error.message}</div>
+        ) : (
+          <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
+            <AgGridReact
+              rowData={filteredItems}
+              columnDefs={columnDefs}
+              pagination={true}
+              paginationPageSize={10}
+              defaultColDef={{
+                resizable: true,
+                sortable: true,
+                filter: true
+              }}
+              suppressRowClickSelection={true}
+            />
+          </div>
+        )}
       </div>
 
       {showModal && (
@@ -242,11 +240,11 @@ const StockManagement = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Current Stock</label>
-                <input type="number" placeholder="e.g., 50" value={newItem.current} onChange={(e) => setNewItem({...newItem, current: parseInt(e.target.value)})} className="w-full px-4 py-2 border rounded-lg" />
+                <input type="number" placeholder="e.g., 50" value={newItem.currentStock} onChange={(e) => setNewItem({...newItem, currentStock: parseInt(e.target.value)})} className="w-full px-4 py-2 border rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Minimum Level</label>
-                <input type="number" placeholder="e.g., 20" value={newItem.minimum} onChange={(e) => setNewItem({...newItem, minimum: parseInt(e.target.value)})} className="w-full px-4 py-2 border rounded-lg" />
+                <input type="number" placeholder="e.g., 20" value={newItem.minStock} onChange={(e) => setNewItem({...newItem, minStock: parseInt(e.target.value)})} className="w-full px-4 py-2 border rounded-lg" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Unit</label>

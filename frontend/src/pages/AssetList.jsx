@@ -3,37 +3,27 @@ import { Plus, Filter, Edit, Trash2 } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
+import { useFirebaseData } from '../hooks/useFirebaseData';
+import databaseService from '../services/databaseService';
 
 const AssetList = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [editingAsset, setEditingAsset] = useState(null);
-  const [deleteHistory, setDeleteHistory] = useState([]);
   const [newAsset, setNewAsset] = useState({ name: '', category: '', room: '', quantity: 0, value: '' });
   const [filters, setFilters] = useState({ category: 'All' });
   
-  const defaultAssets = [
-    { id: 1, name: 'Dell Laptop', category: 'Electronics', room: 'Lab 3', quantity: 25, value: '$25,000' },
-    { id: 2, name: 'Projector', category: 'Electronics', room: 'Room 201', quantity: 1, value: '$1,200' },
-    { id: 3, name: 'Desk Chair', category: 'Furniture', room: 'Office', quantity: 50, value: '$5,000' },
-    { id: 4, name: 'Microscope', category: 'Lab Equipment', room: 'Science Lab', quantity: 15, value: '$18,000' },
-    { id: 5, name: 'Whiteboard', category: 'Furniture', room: 'Room 105', quantity: 30, value: '$3,000' },
-    { id: 6, name: 'Basketball', category: 'Sports', room: 'Gym', quantity: 20, value: '$600' }
-  ];
+  const { data: assets, loading, error } = useFirebaseData('assets');
 
-  const [assets, setAssets] = useState(() => {
-    const saved = localStorage.getItem('assets');
-    return saved ? JSON.parse(saved) : defaultAssets;
-  });
-
-  const handleDelete = (id) => {
+  const handleDelete = async (firebaseId) => {
     if (window.confirm('Are you sure you want to delete this asset?')) {
-      const deletedAsset = assets.find(asset => asset.id === id);
-      setDeleteHistory([...deleteHistory, { ...deletedAsset, deletedAt: new Date().toLocaleString() }]);
-      const updatedAssets = assets.filter(asset => asset.id !== id);
-      setAssets(updatedAssets);
-      localStorage.setItem('assets', JSON.stringify(updatedAssets));
+      try {
+        await databaseService.deleteAsset(firebaseId);
+      } catch (error) {
+        console.error('Error deleting asset:', error);
+        alert('Error deleting asset. Please try again.');
+      }
     }
   };
 
@@ -42,18 +32,32 @@ const AssetList = () => {
     setShowModal(true);
   };
 
-  const handleSave = () => {
-    let updatedAssets;
-    if (editingAsset) {
-      updatedAssets = assets.map(a => a.id === editingAsset.id ? editingAsset : a);
-    } else {
-      updatedAssets = [...assets, { ...newAsset, id: Date.now() }];
-      setNewAsset({ name: '', category: '', room: '', quantity: 0, value: '' });
+  const handleSave = async () => {
+    try {
+      if (editingAsset) {
+        await databaseService.updateAsset(editingAsset.firebaseId, {
+          name: editingAsset.name,
+          category: editingAsset.category,
+          room: editingAsset.room,
+          quantity: editingAsset.quantity,
+          value: editingAsset.value
+        });
+      } else {
+        await databaseService.addAsset({
+          name: newAsset.name,
+          category: newAsset.category,
+          room: newAsset.room,
+          quantity: newAsset.quantity,
+          value: newAsset.value
+        });
+        setNewAsset({ name: '', category: '', room: '', quantity: 0, value: '' });
+      }
+      setShowModal(false);
+      setEditingAsset(null);
+    } catch (error) {
+      console.error('Error saving asset:', error);
+      alert('Error saving asset. Please try again.');
     }
-    setAssets(updatedAssets);
-    localStorage.setItem('assets', JSON.stringify(updatedAssets));
-    setShowModal(false);
-    setEditingAsset(null);
   };
 
   const handleAddNew = () => {
@@ -80,7 +84,7 @@ const AssetList = () => {
           <button onClick={() => handleEdit(params.data)} className="text-primary hover:text-primary/80">
             <Edit size={16} />
           </button>
-          <button onClick={() => handleDelete(params.data.id)} className="text-red-600 hover:text-red-700">
+          <button onClick={() => handleDelete(params.data.firebaseId)} className="text-red-600 hover:text-red-700">
             <Trash2 size={16} />
           </button>
         </div>
@@ -115,20 +119,26 @@ const AssetList = () => {
           </button>
         </div>
 
-        <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
-          <AgGridReact
-            rowData={filteredAssets}
-            columnDefs={columnDefs}
-            pagination={true}
-            paginationPageSize={10}
-            defaultColDef={{
-              resizable: true,
-              sortable: true,
-              filter: true
-            }}
-            suppressRowClickSelection={true}
-          />
-        </div>
+        {loading ? (
+          <div className="text-center py-8">Loading assets...</div>
+        ) : error ? (
+          <div className="text-center py-8 text-red-600">Error loading assets: {error.message}</div>
+        ) : (
+          <div className="ag-theme-alpine" style={{ height: '500px', width: '100%' }}>
+            <AgGridReact
+              rowData={filteredAssets}
+              columnDefs={columnDefs}
+              pagination={true}
+              paginationPageSize={10}
+              defaultColDef={{
+                resizable: true,
+                sortable: true,
+                filter: true
+              }}
+              suppressRowClickSelection={true}
+            />
+          </div>
+        )}
       </div>
 
       {showFilterModal && (

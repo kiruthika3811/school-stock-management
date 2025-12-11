@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { Package, Warehouse, Wrench, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import StatsCard from '../components/dashboard/StatsCard';
+import AdminPanel from '../components/admin/AdminPanel';
+import DatabaseInit from '../components/admin/DatabaseInit';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useStats, useFirebaseData } from '../hooks/useFirebaseData';
+import databaseService from '../services/databaseService';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState('');
   const [formData, setFormData] = useState({});
-  const [savedData, setSavedData] = useState({
-    assets: [],
-    stocks: [],
-    repairs: [],
-    purchases: []
-  });
+  const { stats, loading: statsLoading } = useStats();
+  const { data: recentActivity } = useFirebaseData('notifications');
 
   const openModal = (type) => {
     setModalType(type);
@@ -22,78 +22,103 @@ const Dashboard = () => {
     setShowModal(true);
   };
 
-  const addNotification = (title, message, type) => {
-    const notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
-    const newNotification = { id: Date.now(), title, message, time: 'Just now', type, read: false };
-    localStorage.setItem('notifications', JSON.stringify([newNotification, ...notifications]));
+  const addNotification = async (title, message, type) => {
+    await databaseService.addNotification({
+      title,
+      message,
+      type,
+      time: 'Just now'
+    });
   };
 
-  const handleSave = () => {
-    const timestamp = new Date().toLocaleString();
-    if (modalType === 'asset') {
-      const newAsset = { id: Date.now(), name: formData.name, category: formData.category, room: formData.room, quantity: formData.quantity, value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0', timestamp };
-      const existingAssets = JSON.parse(localStorage.getItem('assets') || '[]');
-      localStorage.setItem('assets', JSON.stringify([...existingAssets, newAsset]));
-      addNotification('New Asset Added', `${formData.name} added to ${formData.room}`, 'info');
+  const handleSave = async () => {
+    try {
+      if (modalType === 'asset') {
+        await databaseService.addAsset({
+          name: formData.name,
+          category: formData.category,
+          room: formData.room,
+          quantity: parseInt(formData.quantity) || 1,
+          value: formData.quantity ? `$${parseInt(formData.quantity) * 100}` : '$0'
+        });
+        await addNotification('New Asset Added', `${formData.name} added to ${formData.room}`, 'success');
+        navigate('/assets');
+      } else if (modalType === 'stock') {
+        await databaseService.addStockItem({
+          itemName: formData.itemName,
+          currentStock: parseInt(formData.currentStock) || 0,
+          newStock: parseInt(formData.newStock) || 0,
+          minStock: 10
+        });
+        await addNotification('Stock Updated', `${formData.itemName} stock updated`, 'success');
+        navigate('/stock');
+      } else if (modalType === 'repair') {
+        await databaseService.addRepair({
+          assetName: formData.assetName,
+          issue: formData.issue,
+          location: formData.location
+        });
+        await addNotification('Repair Reported', `${formData.assetName} needs repair`, 'warning');
+        navigate('/repairs');
+      } else if (modalType === 'purchase') {
+        await databaseService.addPurchaseRequest({
+          itemName: formData.itemName,
+          quantity: parseInt(formData.quantity) || 1,
+          cost: formData.cost,
+          justification: formData.justification
+        });
+        await addNotification('Purchase Request', `${formData.itemName} purchase requested`, 'info');
+        navigate('/purchases');
+      }
       setShowModal(false);
       setFormData({});
-      navigate('/assets');
-    } else if (modalType === 'stock') {
-      const stockUpdate = { id: Date.now(), itemName: formData.itemName, currentStock: formData.currentStock, newStock: formData.newStock, timestamp };
-      const existingStocks = JSON.parse(localStorage.getItem('stocks') || '[]');
-      localStorage.setItem('stocks', JSON.stringify([...existingStocks, stockUpdate]));
-      addNotification('Stock Updated', `${formData.itemName} stock updated`, 'success');
-      setShowModal(false);
-      setFormData({});
-      navigate('/stock');
-    } else if (modalType === 'repair') {
-      const repairReport = { id: Date.now(), assetName: formData.assetName, issue: formData.issue, location: formData.location, status: 'Pending', timestamp };
-      const existingRepairs = JSON.parse(localStorage.getItem('repairs') || '[]');
-      localStorage.setItem('repairs', JSON.stringify([...existingRepairs, repairReport]));
-      addNotification('Repair Reported', `${formData.assetName} needs repair`, 'warning');
-      setShowModal(false);
-      setFormData({});
-      navigate('/repairs');
-    } else if (modalType === 'purchase') {
-      const purchaseRequest = { id: Date.now(), itemName: formData.itemName, quantity: formData.quantity, cost: formData.cost, justification: formData.justification, status: 'Pending', timestamp };
-      const existingPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-      localStorage.setItem('purchases', JSON.stringify([...existingPurchases, purchaseRequest]));
-      addNotification('Purchase Request', `${formData.itemName} purchase requested`, 'info');
-      setShowModal(false);
-      setFormData({});
-      navigate('/purchases');
+    } catch (error) {
+      console.error('Error saving data:', error);
+      alert('Error saving data. Please try again.');
     }
   };
 
-  const stats = [
-    { title: 'Total Assets', value: '1,247', icon: Package, trend: 'up', trendValue: '+12%', color: 'primary' },
-    { title: 'Stock Items', value: '3,456', icon: Warehouse, trend: 'up', trendValue: '+8%', color: 'success' },
-    { title: 'Pending Repairs', value: '23', icon: Wrench, trend: 'down', trendValue: '-5%', color: 'warning' },
-    { title: 'Low Stock Alerts', value: '15', icon: AlertTriangle, color: 'danger' }
+  const statsCards = [
+    { title: 'Total Assets', value: stats.totalAssets.toString(), icon: Package, trend: 'up', trendValue: '+12%', color: 'primary' },
+    { title: 'Stock Items', value: stats.stockItems.toString(), icon: Warehouse, trend: 'up', trendValue: '+8%', color: 'success' },
+    { title: 'Pending Repairs', value: stats.pendingRepairs.toString(), icon: Wrench, trend: 'down', trendValue: '-5%', color: 'warning' },
+    { title: 'Low Stock Alerts', value: stats.lowStockAlerts.toString(), icon: AlertTriangle, color: 'danger' }
   ];
 
-  const assetsByCategory = [
-    { name: 'Electronics', value: 450, color: '#2563eb' },
-    { name: 'Furniture', value: 320, color: '#10b981' },
-    { name: 'Sports', value: 180, color: '#f59e0b' },
-    { name: 'Lab Equipment', value: 297, color: '#7c3aed' }
-  ];
+  const { data: assets } = useFirebaseData('assets');
+  const { data: repairs } = useFirebaseData('repairs');
 
-  const monthlyData = [
-    { month: 'Jan', assets: 1100, repairs: 45 },
-    { month: 'Feb', assets: 1150, repairs: 38 },
-    { month: 'Mar', assets: 1180, repairs: 42 },
-    { month: 'Apr', assets: 1200, repairs: 35 },
-    { month: 'May', assets: 1230, repairs: 28 },
-    { month: 'Jun', assets: 1247, repairs: 23 }
-  ];
+  const assetsByCategory = React.useMemo(() => {
+    const categories = {};
+    assets.forEach(asset => {
+      const category = asset.category || 'Other';
+      categories[category] = (categories[category] || 0) + (asset.quantity || 1);
+    });
+    
+    const colors = ['#2563eb', '#10b981', '#f59e0b', '#7c3aed', '#ef4444', '#06b6d4'];
+    return Object.entries(categories).map(([name, value], index) => ({
+      name,
+      value,
+      color: colors[index % colors.length]
+    }));
+  }, [assets]);
 
-  const recentActivity = [
-    { id: 1, action: 'New asset added', item: 'Dell Laptop - Lab 3', time: '5 min ago', type: 'success' },
-    { id: 2, action: 'Repair completed', item: 'Projector - Room 201', time: '1 hour ago', type: 'info' },
-    { id: 3, action: 'Low stock alert', item: 'Whiteboard Markers', time: '2 hours ago', type: 'warning' },
-    { id: 4, action: 'Purchase request', item: 'Chemistry Lab Equipment', time: '3 hours ago', type: 'primary' }
-  ];
+  const monthlyData = React.useMemo(() => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return months.map(month => ({
+      month,
+      assets: assets.length,
+      repairs: repairs.filter(r => r.status === 'Pending').length
+    }));
+  }, [assets, repairs]);
+
+  const activityItems = recentActivity.slice(0, 4).map(notification => ({
+    id: notification.id,
+    action: notification.title,
+    item: notification.message,
+    time: notification.time || 'Recently',
+    type: notification.type || 'info'
+  }));
 
   const typeColors = {
     success: 'bg-green-100 text-green-700',
@@ -110,10 +135,17 @@ const Dashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
-        {stats.map((stat, index) => (
-          <StatsCard key={index} {...stat} />
-        ))}
+        {statsLoading ? (
+          <div className="col-span-full text-center py-8">Loading statistics...</div>
+        ) : (
+          statsCards.map((stat, index) => (
+            <StatsCard key={index} {...stat} />
+          ))
+        )}
       </div>
+
+      <DatabaseInit />
+      <AdminPanel />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         <div className="card">
@@ -163,18 +195,22 @@ const Dashboard = () => {
           </div>
           
           <div className="space-y-2 sm:space-y-3">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-gray-50 rounded-lg transition-colors">
-                <div className={`p-1.5 sm:p-2 rounded-lg ${typeColors[activity.type]} flex-shrink-0`}>
-                  <Clock size={14} className="sm:w-4 sm:h-4" />
+            {activityItems.length > 0 ? (
+              activityItems.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className={`p-1.5 sm:p-2 rounded-lg ${typeColors[activity.type]} flex-shrink-0`}>
+                    <Clock size={14} className="sm:w-4 sm:h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-xs sm:text-sm">{activity.action}</p>
+                    <p className="text-gray-600 text-xs sm:text-sm truncate">{activity.item}</p>
+                  </div>
+                  <span className="text-xs text-gray-500 flex-shrink-0">{activity.time}</span>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-xs sm:text-sm">{activity.action}</p>
-                  <p className="text-gray-600 text-xs sm:text-sm truncate">{activity.item}</p>
-                </div>
-                <span className="text-xs text-gray-500 flex-shrink-0">{activity.time}</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-4 text-gray-500">No recent activity</div>
+            )}
           </div>
         </div>
 

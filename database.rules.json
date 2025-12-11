@@ -1,0 +1,48 @@
+{
+  "rules": {
+    ".read": "auth != null",
+    ".write": "auth != null",
+    
+    "assets": {
+      ".indexOn": ["category", "room", "createdAt"],
+      "$assetId": {
+        ".validate": "newData.hasChildren(['name', 'category', 'room', 'quantity', 'value']) && newData.child('name').isString() && newData.child('category').isString() && newData.child('room').isString() && newData.child('quantity').isNumber() && newData.child('value').isString()"
+      }
+    },
+    
+    "stock": {
+      ".indexOn": ["category", "currentStock", "createdAt"],
+      "$stockId": {
+        ".validate": "newData.hasChildren(['itemName', 'category', 'currentStock', 'minStock']) && newData.child('itemName').isString() && newData.child('category').isString() && newData.child('currentStock').isNumber() && newData.child('minStock').isNumber()"
+      }
+    },
+    
+    "repairs": {
+      ".indexOn": ["status", "location", "createdAt"],
+      "$repairId": {
+        ".validate": "newData.hasChildren(['assetName', 'issue', 'location', 'status']) && newData.child('assetName').isString() && newData.child('issue').isString() && newData.child('location').isString() && newData.child('status').isString()"
+      }
+    },
+    
+    "purchases": {
+      ".indexOn": ["status", "createdAt"],
+      "$purchaseId": {
+        ".validate": "newData.hasChildren(['itemName', 'quantity', 'cost', 'status']) && newData.child('itemName').isString() && newData.child('quantity').isNumber() && newData.child('cost').isString() && newData.child('status').isString()"
+      }
+    },
+    
+    "notifications": {
+      ".indexOn": ["read", "createdAt", "type"],
+      "$notificationId": {
+        ".validate": "newData.hasChildren(['title', 'message', 'type']) && newData.child('title').isString() && newData.child('message').isString() && newData.child('type').isString()"
+      }
+    },
+    
+    "rooms": {
+      ".indexOn": ["name", "createdAt"],
+      "$roomId": {
+        ".validate": "newData.hasChildren(['name', 'description']) && newData.child('name').isString() && newData.child('description').isString()"
+      }
+    }
+  }
+}

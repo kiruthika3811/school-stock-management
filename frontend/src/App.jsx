@@ -12,6 +12,7 @@ import LowStockAlerts from './pages/LowStockAlerts';
 import PurchaseRequests from './pages/PurchaseRequests';
 import SignIn from './pages/SignIn';
 import SetupUsers from './pages/SetupUsers';
+import { initializeDatabase } from './scripts/initializeDatabase';
 
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -19,8 +20,36 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { user } = useAuth();
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth >= 1024) {
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    // Initialize database with sample data when user logs in
+    if (user) {
+      const hasInitialized = localStorage.getItem('dbInitialized');
+      if (!hasInitialized) {
+        initializeDatabase().then((success) => {
+          if (success) {
+            localStorage.setItem('dbInitialized', 'true');
+          }
+        });
+      }
+    }
+  }, [user]);
 
   return (
     <Router>

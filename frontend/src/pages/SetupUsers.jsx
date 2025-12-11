@@ -11,7 +11,6 @@ const SetupUsers = () => {
     setStatus('Setting up users in Firestore...');
     const users = [
       { email: 'admin@school.com', password: 'password', name: 'Admin User', role: 'admin' },
-      { email: 'manager@school.com', password: 'password', name: 'Manager User', role: 'manager' },
       { email: 'staff@school.com', password: 'password', name: 'Staff User', role: 'staff' }
     ];
 
@@ -61,7 +60,6 @@ const SetupUsers = () => {
             <p className="text-sm text-gray-700 mb-2">This will add user data to Firestore:</p>
             <ul className="text-sm space-y-1">
               <li>• admin@school.com (Admin)</li>
-              <li>• manager@school.com (Manager)</li>
               <li>• staff@school.com (Staff)</li>
             </ul>
             <p className="text-xs text-gray-500 mt-2">Password for all: password</p>

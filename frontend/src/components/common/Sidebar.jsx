@@ -8,13 +8,13 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
   const { user } = useAuth();
   
   const allMenuItems = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin', 'manager', 'staff'] },
-    { icon: Package, label: 'Assets', path: '/assets', roles: ['admin', 'manager', 'staff'] },
-    { icon: Warehouse, label: 'Stock Management', path: '/stock', roles: ['admin', 'manager'] },
-    { icon: MapPin, label: 'Room Assets', path: '/rooms', roles: ['admin', 'manager', 'staff'] },
-    { icon: Wrench, label: 'Repair History', path: '/repairs', roles: ['admin', 'manager'] },
-    { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/alerts', roles: ['admin', 'manager', 'staff'] },
-    { icon: ShoppingCart, label: 'Purchase Requests', path: '/purchases', roles: ['admin', 'manager'] }
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin', 'staff'] },
+    { icon: Package, label: 'Assets', path: '/assets', roles: ['admin', 'staff'] },
+    { icon: Warehouse, label: 'Stock Management', path: '/stock', roles: ['admin'] },
+    { icon: MapPin, label: 'Room Assets', path: '/rooms', roles: ['admin', 'staff'] },
+    { icon: Wrench, label: 'Repair History', path: '/repairs', roles: ['admin'] },
+    { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/alerts', roles: ['admin', 'staff'] },
+    { icon: ShoppingCart, label: 'Purchase Requests', path: '/purchases', roles: ['admin'] }
   ];
 
   const menuItems = allMenuItems.filter(item => item.roles.includes(user?.role));
@@ -29,10 +29,10 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       )}
       
       <aside className={`
-        fixed top-0 left-0 h-full bg-primary border-r border-primary z-50 transition-transform duration-300
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
-        lg:translate-x-0 lg:static lg:z-0
-        w-64
+        fixed lg:relative lg:translate-x-0
+        w-64 h-full bg-primary border-r border-primary flex-shrink-0
+        transition-transform duration-300 ease-in-out z-50
       `}>
         <div className="flex items-center justify-between p-6 border-b border-white/20">
           <div className="flex items-center gap-3">

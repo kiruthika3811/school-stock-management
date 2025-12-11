@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from '../firebase/config';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, setDoc, collection, addDoc } from 'firebase/firestore';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { doc, getDoc, setDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -14,28 +14,13 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        try {
-          const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-          if (userDoc.exists()) {
-            const userData = userDoc.data();
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              name: userData.name,
-              role: userData.role
-            });
-          } else {
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              name: firebaseUser.email.split('@')[0],
-              role: 'staff'
-            });
-          }
-        } catch (error) {
-          console.error('Error fetching user data:', error);
-          setUser(null);
-        }
+        setUser({
+          uid: firebaseUser.uid,
+          email: firebaseUser.email,
+          name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+          role: 'admin',
+          photoURL: firebaseUser.photoURL
+        });
       } else {
         setUser(null);
       }
@@ -61,6 +46,22 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.addScope('email');
+      provider.addScope('profile');
+      const result = await signInWithPopup(auth, provider);
+      return { success: true };
+    } catch (error) {
+      console.error('Google login error:', error);
+      if (error.code === 'auth/popup-closed-by-user') {
+        return { success: false, error: 'Sign-in cancelled' };
+      }
+      return { success: false, error: 'Google sign-in failed' };
+    }
+  };
+
   const logout = async () => {
     try {
       await signOut(auth);
@@ -76,14 +77,29 @@ export const AuthProvider = ({ children }) => {
     
     if (request) {
       try {
-        const userCredential = await createUserWithEmailAndPassword(auth, request.email, 'password123');
-        
-        await setDoc(doc(db, 'users', userCredential.user.uid), {
-          name: request.name,
-          email: request.email,
-          role: role,
-          createdAt: new Date().toISOString()
-        });
+        if (request.authMethod === 'google') {
+          // For Google users, create user document with a placeholder UID
+          // The actual UID will be set when they sign in with Google again
+          await setDoc(doc(db, 'approvedUsers', request.email), {
+            name: request.name,
+            email: request.email,
+            role: role,
+            photoURL: request.photoURL || null,
+            authMethod: 'google',
+            approvedAt: new Date().toISOString(),
+            createdAt: new Date().toISOString()
+          });
+        } else {
+          // For email/password users, create Firebase auth account
+          const userCredential = await createUserWithEmailAndPassword(auth, request.email, 'password123');
+          
+          await setDoc(doc(db, 'users', userCredential.user.uid), {
+            name: request.name,
+            email: request.email,
+            role: role,
+            createdAt: new Date().toISOString()
+          });
+        }
 
         request.status = 'approved';
         localStorage.setItem('accessRequests', JSON.stringify(accessRequests));
@@ -92,7 +108,7 @@ export const AuthProvider = ({ children }) => {
         const updatedNotifications = notifications.filter(n => n.requestId !== requestId);
         localStorage.setItem('notifications', JSON.stringify(updatedNotifications));
       } catch (error) {
-        console.error('Error creating user:', error);
+        console.error('Error approving user:', error);
       }
     }
   };
@@ -127,7 +143,7 @@ export const AuthProvider = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, approveAccessRequest, rejectAccessRequest }}>
+    <AuthContext.Provider value={{ user, login, loginWithGoogle, logout, approveAccessRequest, rejectAccessRequest }}>
       {children}
     </AuthContext.Provider>
   );
