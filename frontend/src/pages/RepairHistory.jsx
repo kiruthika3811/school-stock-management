@@ -1,67 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Wrench, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { useFirebaseData } from '../hooks/useFirebaseData';
+import databaseService from '../services/databaseService';
 
 const RepairHistory = () => {
-  const defaultRepairs = [
-    { id: 1, asset: 'Projector', room: 'Room 201', issue: 'Lamp failure', status: 'Completed', date: '2024-01-15', cost: '$150' },
-    { id: 2, asset: 'Dell Laptop', room: 'Lab 3', issue: 'Screen damage', status: 'In Progress', date: '2024-01-18', cost: '$200' },
-    { id: 3, asset: 'Air Conditioner', room: 'Office', issue: 'Not cooling', status: 'Pending', date: '2024-01-20', cost: '$300' }
-  ];
+
 
   const [showModal, setShowModal] = useState(false);
   const [newRepair, setNewRepair] = useState({ assetName: '', location: '', issue: '' });
   const [filter, setFilter] = useState('All');
 
-  const handleUpdateStatus = (id, newStatus) => {
-    const updated = repairs.map(r => r.id === id ? {...r, status: newStatus} : r);
-    setRepairs(updated);
-    const savedRepairs = JSON.parse(localStorage.getItem('repairs') || '[]');
-    const updatedRepairs = savedRepairs.map(r => r.id === id ? {...r, status: newStatus} : r);
-    localStorage.setItem('repairs', JSON.stringify(updatedRepairs));
-  };
-
-  const handleSubmitRepair = () => {
-    const repairReport = {
-      id: Date.now(),
-      assetName: newRepair.assetName,
-      issue: newRepair.issue,
-      location: newRepair.location,
-      status: 'Pending',
-      timestamp: new Date().toLocaleString()
-    };
-    const existingRepairs = JSON.parse(localStorage.getItem('repairs') || '[]');
-    localStorage.setItem('repairs', JSON.stringify([...existingRepairs, repairReport]));
-    
-    const newRepairItem = {
-      id: repairReport.id,
-      asset: newRepair.assetName,
-      room: newRepair.location,
-      issue: newRepair.issue,
-      status: 'Pending',
-      date: repairReport.timestamp.split(',')[0],
-      cost: 'TBD'
-    };
-    setRepairs([...repairs, newRepairItem]);
-    setShowModal(false);
-    setNewRepair({ assetName: '', location: '', issue: '' });
-  };
-
-  const [repairs, setRepairs] = useState(() => {
-    const saved = localStorage.getItem('repairs');
-    if (saved) {
-      const savedRepairs = JSON.parse(saved);
-      return [...defaultRepairs, ...savedRepairs.map(r => ({
-        id: r.id,
-        asset: r.assetName,
-        room: r.location,
-        issue: r.issue,
-        status: r.status,
-        date: r.timestamp.split(',')[0],
-        cost: 'TBD'
-      }))];
+  const handleUpdateStatus = async (firebaseId, newStatus) => {
+    try {
+      await databaseService.updateRepair(firebaseId, { status: newStatus });
+    } catch (error) {
+      console.error('Error updating repair status:', error);
     }
-    return defaultRepairs;
-  });
+  };
+
+  const handleSubmitRepair = async () => {
+    try {
+      await databaseService.addRepair({
+        assetName: newRepair.assetName,
+        issue: newRepair.issue,
+        location: newRepair.location
+      });
+      setShowModal(false);
+      setNewRepair({ assetName: '', location: '', issue: '' });
+    } catch (error) {
+      console.error('Error submitting repair:', error);
+    }
+  };
+
+  const { data: repairs, loading } = useFirebaseData('repairs');
 
   const filteredRepairs = filter === 'All' ? repairs : repairs.filter(r => r.status === filter);
 
@@ -100,23 +71,23 @@ const RepairHistory = () => {
                     <div className={`p-3 ${config.bg} rounded-lg ${config.color}`}><Wrench size={24} /></div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-bold">{repair.asset}</h3>
+                        <h3 className="text-lg font-bold">{repair.assetName}</h3>
                         <span className={config.badge}>{repair.status}</span>
                       </div>
                       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm mb-3">
-                        <div><p className="text-gray-500">Location</p><p className="font-medium">{repair.room}</p></div>
+                        <div><p className="text-gray-500">Location</p><p className="font-medium">{repair.location}</p></div>
                         <div><p className="text-gray-500">Issue</p><p className="font-medium">{repair.issue}</p></div>
                         <div><p className="text-gray-500">Date</p><p className="font-medium">{repair.date}</p></div>
                         <div><p className="text-gray-500">Cost</p><p className="font-medium">{repair.cost}</p></div>
                       </div>
                       {repair.status === 'Pending' && (
                         <div className="flex gap-2">
-                          <button onClick={() => handleUpdateStatus(repair.id, 'In Progress')} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Start Repair</button>
+                          <button onClick={() => handleUpdateStatus(repair.firebaseId, 'In Progress')} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm font-medium">Start Repair</button>
                         </div>
                       )}
                       {repair.status === 'In Progress' && (
                         <div className="flex gap-2">
-                          <button onClick={() => handleUpdateStatus(repair.id, 'Completed')} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">Mark Completed</button>
+                          <button onClick={() => handleUpdateStatus(repair.firebaseId, 'Completed')} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">Mark Completed</button>
                         </div>
                       )}
                     </div>

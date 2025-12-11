@@ -1,19 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { MapPin, Package } from 'lucide-react';
+import { useFirebaseData } from '../hooks/useFirebaseData';
 
 const RoomAssets = () => {
-  const [selectedRoom, setSelectedRoom] = useState('Lab 3');
-  const rooms = ['Lab 3', 'Room 201', 'Science Lab', 'Gym', 'Office', 'Library'];
-  const roomAssets = {
-    'Lab 3': [
-      { id: 1, name: 'Dell Laptop', quantity: 25, condition: 'Good', value: '$25,000' },
-      { id: 2, name: 'Mouse', quantity: 25, condition: 'Good', value: '$500' }
-    ],
-    'Room 201': [
-      { id: 3, name: 'Projector', quantity: 1, condition: 'Repair', value: '$1,200' },
-      { id: 4, name: 'Whiteboard', quantity: 2, condition: 'Good', value: '$400' }
-    ]
-  };
+  const { data: assets } = useFirebaseData('assets');
+  
+  const { rooms, roomAssets } = useMemo(() => {
+    const roomsSet = new Set();
+    const assetsByRoom = {};
+    
+    assets.forEach(asset => {
+      const room = asset.room || 'Unassigned';
+      roomsSet.add(room);
+      
+      if (!assetsByRoom[room]) {
+        assetsByRoom[room] = [];
+      }
+      assetsByRoom[room].push(asset);
+    });
+    
+    return {
+      rooms: Array.from(roomsSet).sort(),
+      roomAssets: assetsByRoom
+    };
+  }, [assets]);
+  
+  const [selectedRoom, setSelectedRoom] = useState(rooms[0] || 'No rooms');
 
   return (
     <div className="p-6 space-y-6">
@@ -47,9 +59,9 @@ const RoomAssets = () => {
                       <div className="flex-1">
                         <h4 className="font-bold mb-1">{asset.name}</h4>
                         <div className="space-y-1 text-sm">
-                          <p className="text-gray-600">Quantity: <span className="font-medium">{asset.quantity}</span></p>
-                          <p className="text-gray-600">Condition: <span className="font-medium">{asset.condition}</span></p>
-                          <p className="text-gray-600">Value: <span className="font-medium">{asset.value}</span></p>
+                          <p className="text-gray-600">Quantity: <span className="font-medium">{asset.quantity || 1}</span></p>
+                          <p className="text-gray-600">Category: <span className="font-medium">{asset.category || 'General'}</span></p>
+                          <p className="text-gray-600">Value: <span className="font-medium">{asset.value || 'N/A'}</span></p>
                         </div>
                       </div>
                     </div>

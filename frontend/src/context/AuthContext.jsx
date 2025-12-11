@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth, db } from '../firebase/config';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import { doc, getDoc, setDoc, collection, addDoc, deleteDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
@@ -52,17 +52,14 @@ export const AuthProvider = ({ children }) => {
       provider.setCustomParameters({
         prompt: 'select_account'
       });
-      await signInWithRedirect(auth, provider);
+      const result = await signInWithPopup(auth, provider);
       return { success: true };
     } catch (error) {
       console.error('Google login error:', error);
       if (error.code === 'auth/popup-closed-by-user') {
         return { success: false, error: 'Sign-in cancelled' };
       }
-      if (error.code === 'auth/unauthorized-domain') {
-        return { success: false, error: 'Domain not authorized. Please contact admin.' };
-      }
-      return { success: false, error: `Google sign-in failed: ${error.message}` };
+      return { success: false, error: 'Google sign-in failed' };
     }
   };
 

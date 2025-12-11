@@ -1,99 +1,29 @@
 import React, { useState } from 'react';
 import { TrendingUp, Clock, CheckCircle, XCircle } from 'lucide-react';
+import { useFirebaseData } from '../hooks/useFirebaseData';
+import databaseService from '../services/databaseService';
 
 const PurchaseRequests = () => {
-  const defaultRequests = [
-    { id: 1, itemName: 'Chemistry Lab Equipment', quantity: 10, cost: '$5,000', justification: 'Required for new curriculum', status: 'Approved', date: '2024-01-15' },
-    { id: 2, itemName: 'Sports Equipment', quantity: 20, cost: '$2,000', justification: 'Replacement for damaged items', status: 'Pending', date: '2024-01-18' }
-  ];
 
-  const handleApprove = (id) => {
-    const request = requests.find(r => r.id === id);
-    const updated = requests.map(r => r.id === id ? {...r, status: 'Approved'} : r);
-    setRequests(updated);
-    
-    // Update purchases in localStorage
-    const savedPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-    const updatedPurchases = savedPurchases.map(p => p.id === id ? {...p, status: 'Approved'} : p);
-    localStorage.setItem('purchases', JSON.stringify(updatedPurchases));
-    
-    // Check if item exists in stock
-    const stockItems = JSON.parse(localStorage.getItem('stockItems') || '[]');
-    const existingStockItem = stockItems.find(item => item.name.toLowerCase() === request.itemName.toLowerCase());
-    
-    if (existingStockItem) {
-      // Update existing stock quantity
-      const updatedStock = stockItems.map(item => 
-        item.name.toLowerCase() === request.itemName.toLowerCase()
-          ? { ...item, current: item.current + parseInt(request.quantity) }
-          : item
-      );
-      localStorage.setItem('stockItems', JSON.stringify(updatedStock));
-    } else {
-      // Add new item to stock
-      const newStockItem = {
-        id: Date.now(),
-        name: request.itemName,
-        category: 'General',
-        current: parseInt(request.quantity),
-        minimum: Math.floor(parseInt(request.quantity) * 0.3),
-        unit: 'pcs',
-        status: 'good'
-      };
-      localStorage.setItem('stockItems', JSON.stringify([...stockItems, newStockItem]));
-    }
-    
-    // Check if item exists in assets
-    const assets = JSON.parse(localStorage.getItem('assets') || '[]');
-    const existingAsset = assets.find(asset => asset.name.toLowerCase() === request.itemName.toLowerCase());
-    
-    if (existingAsset) {
-      // Update existing asset quantity
-      const updatedAssets = assets.map(asset => 
-        asset.name.toLowerCase() === request.itemName.toLowerCase()
-          ? { ...asset, quantity: asset.quantity + parseInt(request.quantity) }
-          : asset
-      );
-      localStorage.setItem('assets', JSON.stringify(updatedAssets));
-    } else {
-      // Add new asset
-      const newAsset = {
-        id: Date.now(),
-        name: request.itemName,
-        category: 'General',
-        room: 'Storage',
-        status: 'Active',
-        quantity: parseInt(request.quantity),
-        value: request.cost
-      };
-      localStorage.setItem('assets', JSON.stringify([...assets, newAsset]));
+
+  const handleApprove = async (firebaseId) => {
+    try {
+      await databaseService.updatePurchaseRequest(firebaseId, { status: 'Approved' });
+    } catch (error) {
+      console.error('Error approving request:', error);
     }
   };
 
-  const handleReject = (id) => {
-    const updated = requests.map(r => r.id === id ? {...r, status: 'Rejected'} : r);
-    setRequests(updated);
-    const savedPurchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-    const updatedPurchases = savedPurchases.map(p => p.id === id ? {...p, status: 'Rejected'} : p);
-    localStorage.setItem('purchases', JSON.stringify(updatedPurchases));
+  const handleReject = async (firebaseId) => {
+    try {
+      await databaseService.updatePurchaseRequest(firebaseId, { status: 'Rejected' });
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+    }
   };
 
-  const [requests, setRequests] = useState(() => {
-    const saved = localStorage.getItem('purchases');
-    if (saved) {
-      const savedPurchases = JSON.parse(saved);
-      return [...defaultRequests, ...savedPurchases.map(p => ({
-        id: p.id,
-        itemName: p.itemName,
-        quantity: p.quantity,
-        cost: p.cost,
-        justification: p.justification,
-        status: p.status,
-        date: p.timestamp.split(',')[0]
-      }))];
-    }
-    return defaultRequests;
-  });
+  const { data: purchases, loading } = useFirebaseData('purchases');
+  const requests = purchases || [];
   const [filter, setFilter] = useState('all');
 
   const statusConfig = {
@@ -175,8 +105,8 @@ const PurchaseRequests = () => {
                       </div>
                       {request.status === 'Pending' && (
                         <div className="flex gap-2">
-                          <button onClick={() => handleApprove(request.id)} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">Approve</button>
-                          <button onClick={() => handleReject(request.id)} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-medium">Reject</button>
+                          <button onClick={() => handleApprove(request.firebaseId)} className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 text-sm font-medium">Approve</button>
+                          <button onClick={() => handleReject(request.firebaseId)} className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 text-sm font-medium">Reject</button>
                         </div>
                       )}
                     </div>
