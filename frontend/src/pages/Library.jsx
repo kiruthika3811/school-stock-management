@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, Download } from 'lucide-react';
 import { AgGridReact } from 'ag-grid-react';
 import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 import { useFirebaseData } from '../hooks/useFirebaseData';
 import databaseService from '../services/databaseService';
+import BulkBookImport from '../components/BulkBookImport';
 
 const Library = () => {
   const [showModal, setShowModal] = useState(false);
+  const [showBulkImport, setShowBulkImport] = useState(false);
   const [editingBook, setEditingBook] = useState(null);
   const [newBook, setNewBook] = useState({ 
     title: '', 
@@ -15,7 +17,6 @@ const Library = () => {
     isbn: '', 
     category: '', 
     quantity: 1, 
-    available: 1 
   });
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -30,7 +31,6 @@ const Library = () => {
           isbn: editingBook.isbn,
           category: editingBook.category,
           quantity: editingBook.quantity,
-          available: editingBook.available
         });
       } else {
         await databaseService.addBook({
@@ -39,9 +39,8 @@ const Library = () => {
           isbn: newBook.isbn,
           category: newBook.category,
           quantity: parseInt(newBook.quantity) || 1,
-          available: parseInt(newBook.available) || 1
         });
-        setNewBook({ title: '', author: '', isbn: '', category: '', quantity: 1, available: 1 });
+        setNewBook({ title: '', author: '', isbn: '', category: '', quantity: 1});
       }
       setShowModal(false);
       setEditingBook(null);
@@ -73,7 +72,6 @@ const Library = () => {
     { field: 'isbn', headerName: 'ISBN', flex: 1, sortable: true, filter: true },
     { field: 'category', headerName: 'Category', flex: 1, sortable: true, filter: true },
     { field: 'quantity', headerName: 'Total', width: 100, sortable: true },
-    { field: 'available', headerName: 'Available', width: 100, sortable: true },
     {
       headerName: 'Actions',
       width: 120,
@@ -105,10 +103,16 @@ const Library = () => {
           <h1 className="text-3xl font-bold mb-2">Library Management</h1>
           <p className="text-gray-500">Manage books and library resources</p>
         </div>
-        <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
-          <Plus size={20} />
-          Add New Book
-        </button>
+        <div className="flex gap-2">
+          <button onClick={() => setShowBulkImport(true)} className="btn-secondary flex items-center gap-2">
+            <Download size={20} />
+            Import Books
+          </button>
+          <button onClick={() => setShowModal(true)} className="btn-primary flex items-center gap-2">
+            <Plus size={20} />
+            Add New Book
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-4 mb-4">
@@ -208,16 +212,7 @@ const Library = () => {
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-1">Available Quantity</label>
-                <input 
-                  type="number" 
-                  placeholder="Enter available quantity" 
-                  value={editingBook ? editingBook.available : newBook.available} 
-                  onChange={(e) => editingBook ? setEditingBook({...editingBook, available: parseInt(e.target.value)}) : setNewBook({...newBook, available: parseInt(e.target.value)})} 
-                  className="w-full px-4 py-2 border rounded-lg" 
-                />
-              </div>
+              
             </div>
             
             <div className="flex gap-3 mt-6">
@@ -226,6 +221,13 @@ const Library = () => {
             </div>
           </div>
         </div>
+      )}
+
+      {showBulkImport && (
+        <BulkBookImport 
+          onClose={() => setShowBulkImport(false)}
+          onImportComplete={() => window.location.reload()}
+        />
       )}
     </div>
   );
