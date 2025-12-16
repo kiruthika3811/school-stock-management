@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import StatsCard from '../components/dashboard/StatsCard';
 
 
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useStats, useFirebaseData } from '../hooks/useFirebaseData';
 import databaseService from '../services/databaseService';
 
@@ -14,7 +14,7 @@ const Dashboard = () => {
   const [modalType, setModalType] = useState('');
   const [formData, setFormData] = useState({});
   const { stats, loading: statsLoading } = useStats();
-  const { data: recentActivity } = useFirebaseData('notifications');
+
 
   const openModal = (type) => {
     setModalType(type);
