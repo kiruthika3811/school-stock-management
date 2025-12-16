@@ -6,6 +6,7 @@ import Navbar from './components/common/Navbar';
 import Dashboard from './pages/Dashboard';
 import AssetList from './pages/AssetList';
 import StockManagement from './pages/StockManagement';
+import Library from './pages/Library';
 import RoomAssets from './pages/RoomAssets';
 import RepairHistory from './pages/RepairHistory';
 import LowStockAlerts from './pages/LowStockAlerts';
@@ -69,6 +70,7 @@ function AppContent() {
                   <Route path="/" element={<Dashboard />} />
                   <Route path="/assets" element={<AssetList />} />
                   <Route path="/stock" element={<StockManagement />} />
+                  <Route path="/library" element={<Library />} />
                   <Route path="/rooms" element={<RoomAssets />} />
                   <Route path="/repairs" element={<RepairHistory />} />
                   <Route path="/alerts" element={<LowStockAlerts />} />

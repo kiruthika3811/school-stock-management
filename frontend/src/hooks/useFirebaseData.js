@@ -41,6 +41,12 @@ export const useFirebaseData = (dataType) => {
             setLoading(false);
           });
           break;
+        case 'books':
+          unsubscribe = databaseService.subscribeToBooks((books) => {
+            setData(books);
+            setLoading(false);
+          });
+          break;
         default:
           setError(new Error(`Unknown data type: ${dataType}`));
           setLoading(false);

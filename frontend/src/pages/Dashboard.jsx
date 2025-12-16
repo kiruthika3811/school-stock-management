@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Package, Warehouse, Wrench, AlertTriangle, TrendingUp, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import StatsCard from '../components/dashboard/StatsCard';
-import AdminPanel from '../components/admin/AdminPanel';
+
 
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useStats, useFirebaseData } from '../hooks/useFirebaseData';
@@ -88,6 +88,7 @@ const Dashboard = () => {
 
   const { data: assets } = useFirebaseData('assets');
   const { data: repairs } = useFirebaseData('repairs');
+  const { data: purchases } = useFirebaseData('purchases');
 
   const assetsByCategory = React.useMemo(() => {
     const categories = {};
@@ -104,22 +105,83 @@ const Dashboard = () => {
     }));
   }, [assets]);
 
-  const monthlyData = React.useMemo(() => {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
-    return months.map(month => ({
-      month,
-      assets: assets.length,
-      repairs: repairs.filter(r => r.status === 'Pending').length
-    }));
+  const yearlyData = React.useMemo(() => {
+    const yearlyStats = {};
+    
+    // Process assets by year
+    assets.forEach(asset => {
+      if (asset.createdAt && asset.createdAt.seconds) {
+        const year = new Date(asset.createdAt.seconds * 1000).getFullYear();
+        if (!yearlyStats[year]) yearlyStats[year] = { assets: 0, repairs: 0 };
+        yearlyStats[year].assets += 1;
+      }
+    });
+    
+    // Process repairs by year
+    repairs.forEach(repair => {
+      if (repair.createdAt && repair.createdAt.seconds) {
+        const year = new Date(repair.createdAt.seconds * 1000).getFullYear();
+        if (!yearlyStats[year]) yearlyStats[year] = { assets: 0, repairs: 0 };
+        yearlyStats[year].repairs += 1;
+      }
+    });
+    
+    // Convert to array and sort by year
+    return Object.entries(yearlyStats)
+      .map(([year, data]) => ({ year, ...data }))
+      .sort((a, b) => a.year - b.year);
   }, [assets, repairs]);
 
-  const activityItems = recentActivity.slice(0, 4).map(notification => ({
-    id: notification.id,
-    action: notification.title,
-    item: notification.message,
-    time: notification.time || 'Recently',
-    type: notification.type || 'info'
-  }));
+  const activityItems = React.useMemo(() => {
+    const allActivities = [];
+    
+    // Add recent assets
+    assets.slice(-5).forEach(asset => {
+      if (asset.createdAt) {
+        allActivities.push({
+          id: `asset-${asset.firebaseId}`,
+          action: 'Asset Added',
+          item: `${asset.name} added to ${asset.room}`,
+          time: asset.createdAt.seconds ? new Date(asset.createdAt.seconds * 1000).toLocaleDateString() : 'Recently',
+          type: 'success',
+          timestamp: asset.createdAt.seconds || 0
+        });
+      }
+    });
+    
+    // Add recent repairs
+    repairs.slice(-5).forEach(repair => {
+      if (repair.createdAt) {
+        allActivities.push({
+          id: `repair-${repair.firebaseId}`,
+          action: 'Repair Reported',
+          item: `${repair.assetName} needs repair`,
+          time: repair.createdAt.seconds ? new Date(repair.createdAt.seconds * 1000).toLocaleDateString() : 'Recently',
+          type: 'warning',
+          timestamp: repair.createdAt.seconds || 0
+        });
+      }
+    });
+    
+    // Add recent purchases
+    purchases.slice(-5).forEach(purchase => {
+      if (purchase.createdAt) {
+        allActivities.push({
+          id: `purchase-${purchase.firebaseId}`,
+          action: 'Purchase Request',
+          item: `${purchase.itemName} requested`,
+          time: purchase.createdAt.seconds ? new Date(purchase.createdAt.seconds * 1000).toLocaleDateString() : 'Recently',
+          type: 'info',
+          timestamp: purchase.createdAt.seconds || 0
+        });
+      }
+    });
+    
+    // Sort by timestamp and return latest 4
+    return allActivities
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 4);
+  }, [assets, repairs, purchases]);
 
   const typeColors = {
     success: 'bg-green-100 text-green-700',
@@ -146,15 +208,15 @@ const Dashboard = () => {
       </div>
 
 
-      <AdminPanel />
+
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-6">
         <div className="card">
           <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Asset & Repair Trends</h3>
           <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={monthlyData}>
+            <LineChart data={yearlyData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
+              <XAxis dataKey="year" />
               <YAxis />
               <Tooltip />
               <Legend />

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Package, Warehouse, MapPin, Wrench, AlertTriangle, ShoppingCart, Menu, X } from 'lucide-react';
+import { LayoutDashboard, Package, Warehouse, MapPin, Wrench, AlertTriangle, ShoppingCart, BookOpen, Menu, X } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Sidebar = ({ isOpen, toggleSidebar }) => {
@@ -11,6 +11,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/', roles: ['admin', 'staff'] },
     { icon: Package, label: 'Assets', path: '/assets', roles: ['admin', 'staff'] },
     { icon: Warehouse, label: 'Stock Management', path: '/stock', roles: ['admin'] },
+    { icon: BookOpen, label: 'Library', path: '/library', roles: ['admin', 'staff'] },
     { icon: MapPin, label: 'Room Assets', path: '/rooms', roles: ['admin', 'staff'] },
     { icon: Wrench, label: 'Repair History', path: '/repairs', roles: ['admin'] },
     { icon: AlertTriangle, label: 'Low Stock Alerts', path: '/alerts', roles: ['admin', 'staff'] },

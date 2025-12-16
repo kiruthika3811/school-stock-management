@@ -164,6 +164,37 @@ class DatabaseService {
     });
   }
 
+  // Book Management
+  async addBook(bookData) {
+    const newBook = {
+      ...bookData,
+      id: Date.now().toString(),
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    return await addDoc(collection(db, 'books'), newBook);
+  }
+
+  async updateBook(bookId, updates) {
+    const bookRef = doc(db, 'books', bookId);
+    return await updateDoc(bookRef, {
+      ...updates,
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  async deleteBook(bookId) {
+    const bookRef = doc(db, 'books', bookId);
+    return await deleteDoc(bookRef);
+  }
+
+  subscribeToBooks(callback) {
+    return onSnapshot(collection(db, 'books'), (snapshot) => {
+      const books = snapshot.docs.map(doc => ({ firebaseId: doc.id, ...doc.data() }));
+      callback(books);
+    });
+  }
+
   // Dashboard Statistics
   subscribeToStats(callback) {
     let stats = { totalAssets: 0, stockItems: 0, pendingRepairs: 0, lowStockAlerts: 0 };
