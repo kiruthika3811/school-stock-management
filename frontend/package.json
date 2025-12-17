@@ -2,6 +2,7 @@
   "name": "school-stock-management",
   "version": "0.1.0",
   "private": true,
+  "main": "src/services/booksModule.js",
   "homepage": "https://kiruthika3811.github.io/school-stock-management",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",

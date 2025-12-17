@@ -59,6 +59,7 @@ frontend/
 │   │   ├── createAdmin.js         # Admin user creation script
 │   │   └── initializeDatabase.js  # Database setup script
 │   ├── services/
+│   │   ├── booksModule.js         # Reusable books management module
 │   │   └── databaseService.js     # Database operations service
 │   ├── styles/
 │   │   └── globals.css            # Global CSS styles
@@ -74,7 +75,8 @@ frontend/
 
 ## 🧹 Cleaned Up Files
 The following unnecessary files have been removed:
-- ❌ `backend/` - Unused backend folder (Firebase handles backend)
+- ❌ `backend/` - Empty backend folder (Firebase handles backend)
+- ❌ `src/examples/` - Example files moved to main implementation
 - ❌ Duplicate `src/` and `public/` folders in root
 - ❌ `firebase-debug.log` files
 - ❌ Duplicate config files in root
@@ -96,3 +98,4 @@ npm start
 - **Component-based**: Reusable UI components
 - **Real-time Data**: Live updates with Firebase
 - **Authentication**: Secure user management
+- **Books Module**: Reusable library management functions

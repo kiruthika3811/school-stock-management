@@ -1,20 +1,6 @@
 # 🏫 School Stock Management System
 
-**A comprehensive web-based application for managing school assets, inventory, and equipment tracking.**
-
----
-
-## 📖 Documentation
-
-**All documentation is in one file:** [COMPLETE_DOCUMENTATION.md](COMPLETE_DOCUMENTATION.md)
-
-This single document contains:
-- ✅ Quick Start Guide (5 minutes)
-- ✅ Complete Setup Instructions
-- ✅ Project Structure
-- ✅ Application Workflows with Diagrams
-- ✅ User Guide
-- ✅ Troubleshooting
+**A comprehensive web-based application for managing school assets, inventory, and equipment tracking with reusable books module.**
 
 ---
 
@@ -36,14 +22,42 @@ npm start
 
 ---
 
-## 📋 What This System Does
+## 📋 Features
 
 - 📊 **Dashboard Analytics** - Visual overview of assets and statistics
 - 📦 **Asset Management** - Track all school equipment
 - 📋 **Stock Control** - Monitor inventory with alerts
+- 📚 **Library Management** - Manage books with reusable module
 - 🏢 **Room Assignment** - Organize assets by location
 - 🔧 **Repair Tracking** - Log equipment maintenance
 - 🛒 **Purchase Requests** - Handle procurement workflow
+
+---
+
+## 📚 Books Module
+
+**Reusable module for book management operations:**
+
+```javascript
+import booksModule from './src/services/booksModule';
+
+// Get all books
+const books = await booksModule.books.getAllBooks();
+
+// Search and filter
+const filtered = booksModule.books.searchBooks(books, 'search term');
+
+// Manage selections
+const selected = booksModule.selectedBooks.toggleSelection(ids, bookId);
+
+// Bulk operations
+await booksModule.selectedBooks.bulkDeleteSelected(selectedIds);
+```
+
+**Available Functions:**
+- `getAllBooks()`, `addBook()`, `updateBook()`, `deleteBook()`
+- `searchBooks()`, `filterByCategory()`, `getBooksByAuthor()`
+- `getSelectedBooks()`, `bulkUpdateSelected()`, `bulkDeleteSelected()`
 
 ---
 
@@ -53,18 +67,9 @@ npm start
 - **Backend:** Firebase (Authentication + Firestore)
 - **Data Tables:** AG Grid
 - **Charts:** Recharts
+- **Module Export:** Reusable books management
 
 ---
 
-## 📞 Need Help?
-
-See [COMPLETE_DOCUMENTATION.md](COMPLETE_DOCUMENTATION.md) for:
-- Detailed setup instructions
-- Visual workflow diagrams
-- Troubleshooting guide
-- Complete feature documentation
-
----
-
-**Version:** 1.0  
-**Status:** ✅ Ready to use
+**Version:** 1.1  
+**Status:** ✅ Ready to use with books module
